@@ -1,8 +1,25 @@
 {
   "name": "@pairohit/fnfirestore",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "cleaner function for firestore",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "author": "PaiRohit",
+  "license": "MIT",
+  "homepage": "https://github.com/pairohit16/fnfirestore",
+  "repository": {
+    "url": "https://github.com/pairohit16/fnfirestore",
+    "type": "git"
+  },
+  "bugs": {
+    "url": "https://github.com/pairohit16/fnfirestore/issues"
+  },
+  "contributors": [
+    "PaiRohit"
+  ],
+  "maintainers": [
+    "PaiRohit"
+  ],
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -13,8 +30,6 @@
   "devDependencies": {
     "typescript": "3.4.3"
   },
-  "author": "PaiRohit",
-  "license": "ISC",
   "dependencies": {
     "@google-cloud/firestore": "^4.4.0",
     "firebase-admin": "^9.2.0"
