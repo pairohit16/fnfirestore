@@ -14,7 +14,7 @@ var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (
 var __importStar = (this && this.__importStar) || function (mod) {
     if (mod && mod.__esModule) return mod;
     var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
     __setModuleDefault(result, mod);
     return result;
 };
@@ -55,82 +55,95 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.firescol = exports.firesdocup = exports.firesdoc = void 0;
+exports.firesbatch = exports.firescol = exports.firesdocrt = exports.firesdocup = exports.firesdoc = void 0;
 var admin = __importStar(require("firebase-admin"));
 var firestore = admin.firestore();
-/**
- * Fetch the document
- */
-function firesdoc(params, 
-/** Triggers when document doesn't exists */
-onFail) {
+/** Fetch the document */
+function firesdoc(docpath) {
     return __awaiter(this, void 0, void 0, function () {
         var snap, err_1;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
                     _a.trys.push([0, 2, , 3]);
-                    return [4 /*yield*/, firestore.doc(params.docpath).get()];
+                    return [4 /*yield*/, firestore.doc(docpath).get()];
                 case 1:
                     snap = _a.sent();
                     if (!snap.exists)
-                        onFail && onFail();
+                        return [2 /*return*/, Promise.reject({ code: 404, message: "Not Found!", nonexistent: true })];
                     return [2 /*return*/, snap.data()];
                 case 2:
                     err_1 = _a.sent();
-                    onFail && onFail();
-                    return [3 /*break*/, 3];
+                    return [2 /*return*/, Promise.reject()];
                 case 3: return [2 /*return*/];
             }
         });
     });
 }
 exports.firesdoc = firesdoc;
-/**
- * Update the document
- */
-function firesdocup(params, 
-/** Triggers when document doesn't exists */
-onFail) {
+/** Update the document */
+function firesdocup(docpath, update, 
+/** if enabled, on document don't exist it will throw an error */
+pure) {
+    if (pure === void 0) { pure = false; }
     return __awaiter(this, void 0, void 0, function () {
         var err_2;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
                     _a.trys.push([0, 5, , 6]);
-                    if (!params.forceCreate) return [3 /*break*/, 2];
-                    return [4 /*yield*/, firestore.doc(params.docpath).set(params.update, { merge: !!params.merge ? params.merge : true })];
+                    if (!pure) return [3 /*break*/, 2];
+                    return [4 /*yield*/, firestore.doc(docpath).update(update)];
                 case 1:
                     _a.sent();
                     return [3 /*break*/, 4];
-                case 2: return [4 /*yield*/, firestore.doc(params.docpath).update(params.update)];
+                case 2: return [4 /*yield*/, firestore.doc(docpath).set(update, { merge: true })];
                 case 3:
                     _a.sent();
                     _a.label = 4;
-                case 4: return [3 /*break*/, 6];
+                case 4: return [2 /*return*/, Promise.resolve()];
                 case 5:
                     err_2 = _a.sent();
-                    !!onFail && onFail();
-                    return [3 /*break*/, 6];
+                    return [2 /*return*/, Promise.reject()];
                 case 6: return [2 /*return*/];
             }
         });
     });
 }
 exports.firesdocup = firesdocup;
-/**
- * Firestore collection
- */
-function firescol(params, 
-/** Triggers when collection doesn't exists */
-onFail) {
+/** Create the document */
+function firesdocrt(docpath, create) {
     return __awaiter(this, void 0, void 0, function () {
-        var colpath, query, base, querySnap, err_3;
+        var err_3;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
                     _a.trys.push([0, 2, , 3]);
-                    colpath = params.colpath, query = params.query;
+                    return [4 /*yield*/, firestore.doc(docpath).create(create)];
+                case 1:
+                    _a.sent();
+                    return [2 /*return*/, Promise.resolve(create)];
+                case 2:
+                    err_3 = _a.sent();
+                    return [2 /*return*/, Promise.reject()];
+                case 3: return [2 /*return*/];
+            }
+        });
+    });
+}
+exports.firesdocrt = firesdocrt;
+/**
+ * Query firestore collection
+ * @param colpath firestore collection path
+ * @param query querys to filter collections
+ */
+function firescol(colpath, query) {
+    return __awaiter(this, void 0, void 0, function () {
+        var base, querySnap, err_4;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    _a.trys.push([0, 2, , 3]);
                     base = firestore.collection(colpath);
                     if (query === null || query === void 0 ? void 0 : query.limit)
                         base = base.limit(query.limit);
@@ -144,28 +157,57 @@ onFail) {
                 case 1:
                     querySnap = (_a.sent());
                     if (querySnap.empty)
-                        onFail && onFail();
+                        return [2 /*return*/, Promise.reject({ code: 404, message: "Not Found!", nonexistent: true })];
                     return [2 /*return*/, querySnap.docs.map(function (doc) { return doc.data(); })];
                 case 2:
-                    err_3 = _a.sent();
-                    onFail && onFail();
-                    return [3 /*break*/, 3];
+                    err_4 = _a.sent();
+                    return [2 /*return*/, Promise.reject()];
                 case 3: return [2 /*return*/];
             }
         });
     });
 }
 exports.firescol = firescol;
-// export async function firesbatch<T>(
-//   args: (
-//     | [docpath: string, operation: "create", data: T]
-//     | [docpath: string, operation: "update", data: Partial<T>]
-//     | [docpath: string, operation: "set", data: T]
-//     | [docpath: string, operation: "delete"]
-//   )[]
-// ) {}
-// firesbatch<{ id: string; name: string }>([
-//   ["v1/user", "update", { id: "100", name: "Pai" }],
-//   ["v1/collection", "set", { id: "", name: "" }],
-// ]);
+/** Batch firestore function */
+function firesbatch(args) {
+    return __awaiter(this, void 0, void 0, function () {
+        var batch_1, err_5;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    _a.trys.push([0, 2, , 3]);
+                    batch_1 = firestore.batch();
+                    args.forEach(function (arg) {
+                        switch (arg[1]) {
+                            case "create":
+                                batch_1.create(firestore.doc(arg[0]), arg[2]);
+                                break;
+                            case "set":
+                                batch_1.set(firestore.doc(arg[0]), arg[2]);
+                                break;
+                            case "update":
+                                batch_1.update(firestore.doc(arg[0]), arg[2]);
+                                break;
+                            case "delete":
+                                batch_1.delete(firestore.doc(arg[0]));
+                                break;
+                        }
+                    });
+                    return [4 /*yield*/, batch_1.commit()];
+                case 1:
+                    _a.sent();
+                    return [2 /*return*/, Promise.resolve()];
+                case 2:
+                    err_5 = _a.sent();
+                    return [2 /*return*/, Promise.reject()];
+                case 3: return [2 /*return*/];
+            }
+        });
+    });
+}
+exports.firesbatch = firesbatch;
+// export function firesTransaction() {
+// firestore.runTransaction(transaction => {
+// })
+// }
 //# sourceMappingURL=index.js.map
