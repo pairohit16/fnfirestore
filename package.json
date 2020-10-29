@@ -1,6 +1,6 @@
 {
   "name": "@pairohit/fnfirestore",
-  "version": "1.0.01",
+  "version": "1.0.02",
   "description": "cleaner function for firestore",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -27,11 +27,13 @@
   },
   "peerDependencies": {
     "firebase-admin": "9.2.0",
-    "@google-cloud/firestore": "4.2.0"
+    "@google-cloud/firestore": "4.2.0",
+    "firebase": "^8.0.0"
   },
   "devDependencies": {
-    "typescript": "^4.0.5",
     "@google-cloud/firestore": "^4.4.0",
-    "firebase-admin": "^9.2.0"
+    "firebase": "^8.0.0",
+    "firebase-admin": "^9.2.0",
+    "typescript": "^4.0.5"
   }
 }
