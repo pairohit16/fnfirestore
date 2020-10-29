@@ -1,9 +1,9 @@
 {
   "name": "@pairohit/fnfirestore",
-  "version": "1.0.02",
+  "version": "1.0.03",
   "description": "cleaner function for firestore",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "main": ".",
+  "types": "./index.d.ts",
   "author": "PaiRohit",
   "license": "MIT",
   "homepage": "https://github.com/pairohit16/fnfirestore",
