@@ -1,4 +1,5 @@
 import * as admin from "firebase-admin";
+import { PartialDeep } from "./custom-types";
 const firestore = admin.firestore();
 
 /** Relative increment */
@@ -31,7 +32,7 @@ export async function firesdoc<Data>(docpath: string) {
 /** Update the document */
 export async function firesdocup<Data>(
   docpath: string,
-  update: Partial<Data>,
+  update: PartialDeep<Data>,
   /** if enabled, on document don't exist it will throw an error */
   pure?: boolean
 ) {
@@ -94,7 +95,7 @@ export async function firescol<Data>(
 export async function firesbatch<Data>(
   args: (
     | [docpath: string, operation: "create", data: Data]
-    | [docpath: string, operation: "update", data: Partial<Data>, pure?: boolean]
+    | [docpath: string, operation: "update", data: PartialDeep<Data>, pure?: boolean]
     | [docpath: string, operation: "delete"]
   )[]
 ) {
@@ -127,7 +128,7 @@ export async function firesbatch<Data>(
 
 interface Transaction {
   get<Data>(docpath: string): Promise<Data>;
-  update<Data>(docpath: string, data: Partial<Data>, pure?: boolean): void;
+  update<Data>(docpath: string, data: PartialDeep<Data>, pure?: boolean): void;
   create<Data>(docpath: string, data: Data): void;
   delete(docpath: string): void;
 }
@@ -143,7 +144,7 @@ export async function firesTransaction(func: (transaction: Transaction) => unkno
           return snap.data() as Data;
         },
 
-        update<Data>(docpath: string, data: Partial<Data>, pure?: boolean) {
+        update<Data>(docpath: string, data: PartialDeep<Data>, pure?: boolean) {
           if (pure) {
             transaction.update(admin.firestore().doc(docpath), data);
           } else {
