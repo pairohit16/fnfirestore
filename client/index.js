@@ -84,7 +84,6 @@ exports.firesdoc = firesdoc;
 function firesdocup(docpath, update, 
 /** if enabled, on document don't exist it will throw an error */
 pure) {
-    if (pure === void 0) { pure = false; }
     return __awaiter(this, void 0, void 0, function () {
         var err_2;
         return __generator(this, function (_a) {
@@ -183,11 +182,13 @@ function firesbatch(args) {
                     batch_1 = firestore.batch();
                     args.forEach(function (arg) {
                         switch (arg[1]) {
-                            case "set":
-                                batch_1.set(firestore.doc(arg[0]), arg[2]);
-                                break;
                             case "update":
-                                batch_1.update(firestore.doc(arg[0]), arg[2]);
+                                if (arg[3]) {
+                                    batch_1.update(firestore.doc(arg[0]), arg[2]);
+                                }
+                                else {
+                                    batch_1.set(firestore.doc(arg[0]), arg[2]);
+                                }
                                 break;
                             case "delete":
                                 batch_1.delete(firestore.doc(arg[0]));
@@ -207,14 +208,50 @@ function firesbatch(args) {
     });
 }
 exports.firesbatch = firesbatch;
+/** Transaction */
 function firesTransaction(func) {
-    var _this = this;
-    firestore.runTransaction(function (transaction) { return __awaiter(_this, void 0, void 0, function () {
+    return __awaiter(this, void 0, void 0, function () {
+        var _this = this;
         return __generator(this, function (_a) {
-            func(transaction);
-            return [2 /*return*/];
+            switch (_a.label) {
+                case 0: return [4 /*yield*/, firestore.runTransaction(function (transaction) { return __awaiter(_this, void 0, void 0, function () {
+                        var trans;
+                        return __generator(this, function (_a) {
+                            trans = {
+                                get: function (docpath) {
+                                    return __awaiter(this, void 0, void 0, function () {
+                                        var snap;
+                                        return __generator(this, function (_a) {
+                                            switch (_a.label) {
+                                                case 0: return [4 /*yield*/, transaction.get(firebase_1.default.firestore().doc(docpath))];
+                                                case 1:
+                                                    snap = _a.sent();
+                                                    return [2 /*return*/, snap.data()];
+                                            }
+                                        });
+                                    });
+                                },
+                                update: function (docpath, data, pure) {
+                                    if (pure) {
+                                        transaction.update(firebase_1.default.firestore().doc(docpath), data);
+                                    }
+                                    else {
+                                        transaction.set(firebase_1.default.firestore().doc(docpath), data, { merge: true });
+                                    }
+                                },
+                                delete: function (docpath) {
+                                    transaction.delete(firebase_1.default.firestore().doc(docpath));
+                                },
+                            };
+                            return [2 /*return*/, func(trans)];
+                        });
+                    }); })];
+                case 1:
+                    _a.sent();
+                    return [2 /*return*/];
+            }
         });
-    }); });
+    });
 }
 exports.firesTransaction = firesTransaction;
 //# sourceMappingURL=index.js.map

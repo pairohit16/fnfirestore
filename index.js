@@ -100,7 +100,6 @@ exports.firesdoc = firesdoc;
 function firesdocup(docpath, update, 
 /** if enabled, on document don't exist it will throw an error */
 pure) {
-    if (pure === void 0) { pure = false; }
     return __awaiter(this, void 0, void 0, function () {
         var err_2;
         return __generator(this, function (_a) {
@@ -197,11 +196,13 @@ function firesbatch(args) {
                             case "create":
                                 batch_1.create(firestore.doc(arg[0]), arg[2]);
                                 break;
-                            case "set":
-                                batch_1.set(firestore.doc(arg[0]), arg[2]);
-                                break;
                             case "update":
-                                batch_1.update(firestore.doc(arg[0]), arg[2]);
+                                if (arg[3]) {
+                                    batch_1.update(firestore.doc(arg[0]), arg[2]);
+                                }
+                                else {
+                                    batch_1.set(firestore.doc(arg[0]), arg[2], { merge: true });
+                                }
                                 break;
                             case "delete":
                                 batch_1.delete(firestore.doc(arg[0]));
@@ -221,14 +222,53 @@ function firesbatch(args) {
     });
 }
 exports.firesbatch = firesbatch;
+/** Transaction */
 function firesTransaction(func) {
-    var _this = this;
-    firestore.runTransaction(function (transaction) { return __awaiter(_this, void 0, void 0, function () {
+    return __awaiter(this, void 0, void 0, function () {
+        var _this = this;
         return __generator(this, function (_a) {
-            func(transaction);
-            return [2 /*return*/];
+            switch (_a.label) {
+                case 0: return [4 /*yield*/, firestore.runTransaction(function (transaction) { return __awaiter(_this, void 0, void 0, function () {
+                        var trans;
+                        return __generator(this, function (_a) {
+                            trans = {
+                                get: function (docpath) {
+                                    return __awaiter(this, void 0, void 0, function () {
+                                        var snap;
+                                        return __generator(this, function (_a) {
+                                            switch (_a.label) {
+                                                case 0: return [4 /*yield*/, transaction.get(admin.firestore().doc(docpath))];
+                                                case 1:
+                                                    snap = _a.sent();
+                                                    return [2 /*return*/, snap.data()];
+                                            }
+                                        });
+                                    });
+                                },
+                                update: function (docpath, data, pure) {
+                                    if (pure) {
+                                        transaction.update(admin.firestore().doc(docpath), data);
+                                    }
+                                    else {
+                                        transaction.set(admin.firestore().doc(docpath), data, { merge: true });
+                                    }
+                                },
+                                create: function (docpath, data) {
+                                    transaction.create(admin.firestore().doc(docpath), data);
+                                },
+                                delete: function (docpath) {
+                                    transaction.delete(admin.firestore().doc(docpath));
+                                },
+                            };
+                            return [2 /*return*/, func(trans)];
+                        });
+                    }); }, { maxAttempts: 3 })];
+                case 1:
+                    _a.sent();
+                    return [2 /*return*/];
+            }
         });
-    }); }, { maxAttempts: 3 });
+    });
 }
 exports.firesTransaction = firesTransaction;
 //# sourceMappingURL=index.js.map

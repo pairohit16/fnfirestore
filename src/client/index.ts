@@ -33,7 +33,7 @@ export async function firesdocup<Data>(
   docpath: string,
   update: Partial<Data>,
   /** if enabled, on document don't exist it will throw an error */
-  pure = false
+  pure?: boolean
 ) {
   try {
     if (pure) {
@@ -96,8 +96,7 @@ export async function firescol<Data>(
 /** Batch firestore function */
 export async function firesbatch<Data>(
   args: (
-    | [docpath: string, operation: "update", data: Partial<Data>]
-    | [docpath: string, operation: "set", data: Data]
+    | [docpath: string, operation: "update", data: Partial<Data>, pure?: boolean]
     | [docpath: string, operation: "delete"]
   )[]
 ) {
@@ -105,11 +104,12 @@ export async function firesbatch<Data>(
     const batch = firestore.batch();
     args.forEach((arg) => {
       switch (arg[1]) {
-        case "set":
-          batch.set(firestore.doc(arg[0]), arg[2]);
-          break;
         case "update":
-          batch.update(firestore.doc(arg[0]), arg[2]);
+          if (arg[3]) {
+            batch.update(firestore.doc(arg[0]), arg[2]);
+          } else {
+            batch.set(firestore.doc(arg[0]), arg[2]);
+          }
           break;
         case "delete":
           batch.delete(firestore.doc(arg[0]));
@@ -124,8 +124,35 @@ export async function firesbatch<Data>(
   }
 }
 
-export function firesTransaction(func: (transaction: firebase.firestore.Transaction) => unknown) {
-  firestore.runTransaction(async (transaction) => {
-    func(transaction);
+interface Transaction {
+  get<Data>(docpath: string): Promise<Data>;
+  update<Data>(docpath: string, data: Partial<Data>, pure?: boolean): void;
+  delete(docpath: string): void;
+}
+
+/** Transaction */
+export async function firesTransaction(func: (transaction: Transaction) => unknown) {
+  await firestore.runTransaction(async (transaction) => {
+    // my custom transaction
+    const trans: Transaction = {
+      async get<Data>(docpath: string) {
+        const snap = await transaction.get(firebase.firestore().doc(docpath));
+        return snap.data() as Data;
+      },
+
+      update<Data>(docpath: string, data: Partial<Data>, pure?: boolean) {
+        if (pure) {
+          transaction.update(firebase.firestore().doc(docpath), data);
+        } else {
+          transaction.set(firebase.firestore().doc(docpath), data, { merge: true });
+        }
+      },
+
+      delete(docpath: string) {
+        transaction.delete(firebase.firestore().doc(docpath));
+      },
+    };
+
+    return func(trans);
   });
 }

@@ -33,7 +33,7 @@ export async function firesdocup<Data>(
   docpath: string,
   update: Partial<Data>,
   /** if enabled, on document don't exist it will throw an error */
-  pure = false
+  pure?: boolean
 ) {
   try {
     if (pure) {
@@ -94,8 +94,7 @@ export async function firescol<Data>(
 export async function firesbatch<Data>(
   args: (
     | [docpath: string, operation: "create", data: Data]
-    | [docpath: string, operation: "update", data: Partial<Data>]
-    | [docpath: string, operation: "set", data: Data]
+    | [docpath: string, operation: "update", data: Partial<Data>, pure?: boolean]
     | [docpath: string, operation: "delete"]
   )[]
 ) {
@@ -106,11 +105,12 @@ export async function firesbatch<Data>(
         case "create":
           batch.create(firestore.doc(arg[0]), arg[2]);
           break;
-        case "set":
-          batch.set(firestore.doc(arg[0]), arg[2]);
-          break;
         case "update":
-          batch.update(firestore.doc(arg[0]), arg[2]);
+          if (arg[3]) {
+            batch.update(firestore.doc(arg[0]), arg[2]);
+          } else {
+            batch.set(firestore.doc(arg[0]), arg[2], { merge: true });
+          }
           break;
         case "delete":
           batch.delete(firestore.doc(arg[0]));
@@ -125,10 +125,42 @@ export async function firesbatch<Data>(
   }
 }
 
-export function firesTransaction(func: (transaction: admin.firestore.Transaction) => unknown) {
-  firestore.runTransaction(
+interface Transaction {
+  get<Data>(docpath: string): Promise<Data>;
+  update<Data>(docpath: string, data: Partial<Data>, pure?: boolean): void;
+  create<Data>(docpath: string, data: Data): void;
+  delete(docpath: string): void;
+}
+
+/** Transaction */
+export async function firesTransaction(func: (transaction: Transaction) => unknown) {
+  await firestore.runTransaction(
     async (transaction) => {
-      func(transaction);
+      // my custom transaction
+      const trans: Transaction = {
+        async get<Data>(docpath: string) {
+          const snap = await transaction.get(admin.firestore().doc(docpath));
+          return snap.data() as Data;
+        },
+
+        update<Data>(docpath: string, data: Partial<Data>, pure?: boolean) {
+          if (pure) {
+            transaction.update(admin.firestore().doc(docpath), data);
+          } else {
+            transaction.set(admin.firestore().doc(docpath), data, { merge: true });
+          }
+        },
+
+        create<Data>(docpath: string, data: Data) {
+          transaction.create(admin.firestore().doc(docpath), data);
+        },
+
+        delete(docpath: string) {
+          transaction.delete(admin.firestore().doc(docpath));
+        },
+      };
+
+      return func(trans);
     },
     { maxAttempts: 3 }
   );

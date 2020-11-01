@@ -25,6 +25,13 @@ export declare function firescol<Data>(colpath: string, query?: {
     where?: [keyof Data, "<" | "<=" | "==" | ">=" | ">", any] | [keyof Data, "array-contains" | "in" | "array-contains-any", any[]];
 }): Promise<Data[]>;
 /** Batch firestore function */
-export declare function firesbatch<Data>(args: ([docpath: string, operation: "update", data: Partial<Data>] | [docpath: string, operation: "set", data: Data] | [docpath: string, operation: "delete"])[]): Promise<void>;
-export declare function firesTransaction(func: (transaction: firebase.firestore.Transaction) => unknown): void;
+export declare function firesbatch<Data>(args: ([docpath: string, operation: "update", data: Partial<Data>, pure?: boolean] | [docpath: string, operation: "delete"])[]): Promise<void>;
+interface Transaction {
+    get<Data>(docpath: string): Promise<Data>;
+    update<Data>(docpath: string, data: Partial<Data>, pure?: boolean): void;
+    delete(docpath: string): void;
+}
+/** Transaction */
+export declare function firesTransaction(func: (transaction: Transaction) => unknown): Promise<void>;
+export {};
 //# sourceMappingURL=index.d.ts.map
