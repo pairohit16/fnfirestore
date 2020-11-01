@@ -1,6 +1,10 @@
 import * as admin from "firebase-admin";
 /** Relative increment */
 export declare function firesIncrementBy(number: number): number;
+/** Document Reference */
+export declare function firesDocRef<Data>(docpath: string): FirebaseFirestore.DocumentReference<Data>;
+/** Collection Reference */
+export declare function firesColRef<Data>(colpath: string): FirebaseFirestore.CollectionReference<Data>;
 /** Fetch the document */
 export declare function firesdoc<Data>(docpath: string): Promise<Data>;
 /** Update the document */

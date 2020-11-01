@@ -55,7 +55,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.firesTransaction = exports.firesbatch = exports.firescol = exports.firesdocrt = exports.firesdocup = exports.firesdoc = exports.firesIncrementBy = void 0;
+exports.firesTransaction = exports.firesbatch = exports.firescol = exports.firesdocrt = exports.firesdocup = exports.firesdoc = exports.firesColRef = exports.firesDocRef = exports.firesIncrementBy = void 0;
 var admin = __importStar(require("firebase-admin"));
 var firestore = admin.firestore();
 /** Relative increment */
@@ -63,6 +63,16 @@ function firesIncrementBy(number) {
     return admin.firestore.FieldValue.increment(number);
 }
 exports.firesIncrementBy = firesIncrementBy;
+/** Document Reference */
+function firesDocRef(docpath) {
+    return admin.firestore().doc(docpath);
+}
+exports.firesDocRef = firesDocRef;
+/** Collection Reference */
+function firesColRef(colpath) {
+    return admin.firestore().collection(colpath);
+}
+exports.firesColRef = firesColRef;
 /** Fetch the document */
 function firesdoc(docpath) {
     return __awaiter(this, void 0, void 0, function () {

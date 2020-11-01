@@ -6,6 +6,16 @@ export function firesIncrementBy(number: number): number {
   return firebase.firestore.FieldValue.increment(number) as any;
 }
 
+/** Document Reference */
+export function firesDocRef<Data>(docpath: string) {
+  return firebase.firestore().doc(docpath) as firebase.firestore.DocumentReference<Data>;
+}
+
+/** Collection Reference */
+export function firesColRef<Data>(colpath: string) {
+  return firebase.firestore().collection(colpath) as firebase.firestore.CollectionReference<Data>;
+}
+
 /** Fetch the document */
 export async function firesdoc<Data>(docpath: string) {
   try {

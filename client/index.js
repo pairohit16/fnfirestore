@@ -39,7 +39,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.firesTransaction = exports.firesbatch = exports.firescol = exports.firesdocrt = exports.firesdocup = exports.firesdoc = exports.firesIncrementBy = void 0;
+exports.firesTransaction = exports.firesbatch = exports.firescol = exports.firesdocrt = exports.firesdocup = exports.firesdoc = exports.firesColRef = exports.firesDocRef = exports.firesIncrementBy = void 0;
 var firebase_1 = __importDefault(require("firebase"));
 var firestore = firebase_1.default.firestore();
 /** Relative increment */
@@ -47,6 +47,16 @@ function firesIncrementBy(number) {
     return firebase_1.default.firestore.FieldValue.increment(number);
 }
 exports.firesIncrementBy = firesIncrementBy;
+/** Document Reference */
+function firesDocRef(docpath) {
+    return firebase_1.default.firestore().doc(docpath);
+}
+exports.firesDocRef = firesDocRef;
+/** Collection Reference */
+function firesColRef(colpath) {
+    return firebase_1.default.firestore().collection(colpath);
+}
+exports.firesColRef = firesColRef;
 /** Fetch the document */
 function firesdoc(docpath) {
     return __awaiter(this, void 0, void 0, function () {
