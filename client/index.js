@@ -39,7 +39,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.firesTransaction = exports.firesbatch = exports.firescol = exports.firesdocrt = exports.firesdocup = exports.firesdoc = exports.firesColRef = exports.firesDocRef = exports.firesIncrementBy = void 0;
+exports.firesTransaction = exports.firesbatch = exports.firescol = exports.firesdocrt = exports.firesdocup = exports.firesdoc = exports.firesColRef = exports.firesDocRef = exports.firesArrayUnion = exports.firesIncrementBy = void 0;
 var firebase_1 = __importDefault(require("firebase"));
 var firestore = firebase_1.default.firestore();
 /** Relative increment */
@@ -47,6 +47,12 @@ function firesIncrementBy(number) {
     return firebase_1.default.firestore.FieldValue.increment(number);
 }
 exports.firesIncrementBy = firesIncrementBy;
+/** Array Union */
+function firesArrayUnion(element) {
+    var _a;
+    return (_a = firebase_1.default.firestore.FieldValue).arrayUnion.apply(_a, element);
+}
+exports.firesArrayUnion = firesArrayUnion;
 /** Document Reference */
 function firesDocRef(docpath) {
     return firebase_1.default.firestore().doc(docpath);
@@ -211,44 +217,51 @@ exports.firesbatch = firesbatch;
 /** Transaction */
 function firesTransaction(func) {
     return __awaiter(this, void 0, void 0, function () {
+        var err_6;
         var _this = this;
         return __generator(this, function (_a) {
             switch (_a.label) {
-                case 0: return [4 /*yield*/, firestore.runTransaction(function (transaction) { return __awaiter(_this, void 0, void 0, function () {
-                        var trans;
-                        return __generator(this, function (_a) {
-                            trans = {
-                                get: function (docpath) {
-                                    return __awaiter(this, void 0, void 0, function () {
-                                        var snap;
-                                        return __generator(this, function (_a) {
-                                            switch (_a.label) {
-                                                case 0: return [4 /*yield*/, transaction.get(firebase_1.default.firestore().doc(docpath))];
-                                                case 1:
-                                                    snap = _a.sent();
-                                                    return [2 /*return*/, snap.data()];
-                                            }
+                case 0:
+                    _a.trys.push([0, 2, , 3]);
+                    return [4 /*yield*/, firestore.runTransaction(function (transaction) { return __awaiter(_this, void 0, void 0, function () {
+                            var trans;
+                            return __generator(this, function (_a) {
+                                trans = {
+                                    get: function (docpath) {
+                                        return __awaiter(this, void 0, void 0, function () {
+                                            var snap;
+                                            return __generator(this, function (_a) {
+                                                switch (_a.label) {
+                                                    case 0: return [4 /*yield*/, transaction.get(firebase_1.default.firestore().doc(docpath))];
+                                                    case 1:
+                                                        snap = _a.sent();
+                                                        return [2 /*return*/, snap.data()];
+                                                }
+                                            });
                                         });
-                                    });
-                                },
-                                update: function (docpath, data, pure) {
-                                    if (pure) {
-                                        transaction.update(firebase_1.default.firestore().doc(docpath), data);
-                                    }
-                                    else {
-                                        transaction.set(firebase_1.default.firestore().doc(docpath), data, { merge: true });
-                                    }
-                                },
-                                delete: function (docpath) {
-                                    transaction.delete(firebase_1.default.firestore().doc(docpath));
-                                },
-                            };
-                            return [2 /*return*/, func(trans)];
-                        });
-                    }); })];
+                                    },
+                                    update: function (docpath, data, pure) {
+                                        if (pure) {
+                                            transaction.update(firebase_1.default.firestore().doc(docpath), data);
+                                        }
+                                        else {
+                                            transaction.set(firebase_1.default.firestore().doc(docpath), data, { merge: true });
+                                        }
+                                    },
+                                    delete: function (docpath) {
+                                        transaction.delete(firebase_1.default.firestore().doc(docpath));
+                                    },
+                                };
+                                return [2 /*return*/, func(trans)];
+                            });
+                        }); })];
                 case 1:
                     _a.sent();
-                    return [2 /*return*/];
+                    return [3 /*break*/, 3];
+                case 2:
+                    err_6 = _a.sent();
+                    throw { code: 404, message: "Failed, Please try again!" };
+                case 3: return [2 /*return*/];
             }
         });
     });

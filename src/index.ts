@@ -7,6 +7,11 @@ export function firesIncrementBy(number: number): number {
   return admin.firestore.FieldValue.increment(number) as any;
 }
 
+/** Array Union */
+export function firesArrayUnion<Element>(element: Element[]): Element[] {
+  return admin.firestore.FieldValue.arrayUnion(...element) as any;
+}
+
 /** Document Reference */
 export function firesDocRef<Data>(docpath: string) {
   return admin.firestore().doc(docpath) as admin.firestore.DocumentReference<Data>;
@@ -135,34 +140,38 @@ interface Transaction {
 
 /** Transaction */
 export async function firesTransaction(func: (transaction: Transaction) => unknown) {
-  await firestore.runTransaction(
-    async (transaction) => {
-      // my custom transaction
-      const trans: Transaction = {
-        async get<Data>(docpath: string) {
-          const snap = await transaction.get(admin.firestore().doc(docpath));
-          return snap.data() as Data;
-        },
+  try {
+    await firestore.runTransaction(
+      async (transaction) => {
+        // my custom transaction
+        const trans: Transaction = {
+          async get<Data>(docpath: string) {
+            const snap = await transaction.get(admin.firestore().doc(docpath));
+            return snap.data() as Data;
+          },
 
-        update<Data>(docpath: string, data: PartialDeep<Data>, pure?: boolean) {
-          if (pure) {
-            transaction.update(admin.firestore().doc(docpath), data);
-          } else {
-            transaction.set(admin.firestore().doc(docpath), data, { merge: true });
-          }
-        },
+          update<Data>(docpath: string, data: PartialDeep<Data>, pure?: boolean) {
+            if (pure) {
+              transaction.update(admin.firestore().doc(docpath), data);
+            } else {
+              transaction.set(admin.firestore().doc(docpath), data, { merge: true });
+            }
+          },
 
-        create<Data>(docpath: string, data: Data) {
-          transaction.create(admin.firestore().doc(docpath), data);
-        },
+          create<Data>(docpath: string, data: Data) {
+            transaction.create(admin.firestore().doc(docpath), data);
+          },
 
-        delete(docpath: string) {
-          transaction.delete(admin.firestore().doc(docpath));
-        },
-      };
+          delete(docpath: string) {
+            transaction.delete(admin.firestore().doc(docpath));
+          },
+        };
 
-      return func(trans);
-    },
-    { maxAttempts: 3 }
-  );
+        return func(trans);
+      },
+      { maxAttempts: 3 }
+    );
+  } catch (err) {
+    throw { code: 404, message: "Failed, Please try again!" };
+  }
 }

@@ -7,6 +7,11 @@ export function firesIncrementBy(number: number): number {
   return firebase.firestore.FieldValue.increment(number) as any;
 }
 
+/** Array Union */
+export function firesArrayUnion<Element>(element: Element[]): Element[] {
+  return firebase.firestore.FieldValue.arrayUnion(...element) as any;
+}
+
 /** Document Reference */
 export function firesDocRef<Data>(docpath: string) {
   return firebase.firestore().doc(docpath) as firebase.firestore.DocumentReference<Data>;
@@ -133,27 +138,31 @@ interface Transaction {
 
 /** Transaction */
 export async function firesTransaction(func: (transaction: Transaction) => unknown) {
-  await firestore.runTransaction(async (transaction) => {
-    // my custom transaction
-    const trans: Transaction = {
-      async get<Data>(docpath: string) {
-        const snap = await transaction.get(firebase.firestore().doc(docpath));
-        return snap.data() as Data;
-      },
+  try {
+    await firestore.runTransaction(async (transaction) => {
+      // my custom transaction
+      const trans: Transaction = {
+        async get<Data>(docpath: string) {
+          const snap = await transaction.get(firebase.firestore().doc(docpath));
+          return snap.data() as Data;
+        },
 
-      update<Data>(docpath: string, data: PartialDeep<Data>, pure?: boolean) {
-        if (pure) {
-          transaction.update(firebase.firestore().doc(docpath), data);
-        } else {
-          transaction.set(firebase.firestore().doc(docpath), data, { merge: true });
-        }
-      },
+        update<Data>(docpath: string, data: PartialDeep<Data>, pure?: boolean) {
+          if (pure) {
+            transaction.update(firebase.firestore().doc(docpath), data);
+          } else {
+            transaction.set(firebase.firestore().doc(docpath), data, { merge: true });
+          }
+        },
 
-      delete(docpath: string) {
-        transaction.delete(firebase.firestore().doc(docpath));
-      },
-    };
+        delete(docpath: string) {
+          transaction.delete(firebase.firestore().doc(docpath));
+        },
+      };
 
-    return func(trans);
-  });
+      return func(trans);
+    });
+  } catch (err) {
+    throw { code: 404, message: "Failed, Please try again!" };
+  }
 }

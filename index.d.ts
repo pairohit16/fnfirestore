@@ -1,6 +1,8 @@
 import { PartialDeep } from "./custom-types";
 /** Relative increment */
 export declare function firesIncrementBy(number: number): number;
+/** Array Union */
+export declare function firesArrayUnion<Element>(element: Element[]): Element[];
 /** Document Reference */
 export declare function firesDocRef<Data>(docpath: string): FirebaseFirestore.DocumentReference<Data>;
 /** Collection Reference */
