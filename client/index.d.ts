@@ -1,3 +1,6 @@
+import firebase from "firebase";
+/** Relative increment */
+export declare function firesIncrementBy(number: number): number;
 /** Fetch the document */
 export declare function firesdoc<Data>(docpath: string): Promise<Data>;
 /** Update the document */
@@ -19,4 +22,5 @@ export declare function firescol<Data>(colpath: string, query?: {
 }): Promise<Data[]>;
 /** Batch firestore function */
 export declare function firesbatch<Data>(args: ([docpath: string, operation: "update", data: Partial<Data>] | [docpath: string, operation: "set", data: Data] | [docpath: string, operation: "delete"])[]): Promise<void>;
+export declare function firesTransaction(func: (transaction: firebase.firestore.Transaction) => unknown): void;
 //# sourceMappingURL=index.d.ts.map

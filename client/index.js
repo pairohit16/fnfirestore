@@ -39,9 +39,14 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.firesbatch = exports.firescol = exports.firesdocrt = exports.firesdocup = exports.firesdoc = void 0;
+exports.firesTransaction = exports.firesbatch = exports.firescol = exports.firesdocrt = exports.firesdocup = exports.firesdoc = exports.firesIncrementBy = void 0;
 var firebase_1 = __importDefault(require("firebase"));
 var firestore = firebase_1.default.firestore();
+/** Relative increment */
+function firesIncrementBy(number) {
+    return firebase_1.default.firestore.FieldValue.increment(number);
+}
+exports.firesIncrementBy = firesIncrementBy;
 /** Fetch the document */
 function firesdoc(docpath) {
     return __awaiter(this, void 0, void 0, function () {
@@ -192,4 +197,14 @@ function firesbatch(args) {
     });
 }
 exports.firesbatch = firesbatch;
+function firesTransaction(func) {
+    var _this = this;
+    firestore.runTransaction(function (transaction) { return __awaiter(_this, void 0, void 0, function () {
+        return __generator(this, function (_a) {
+            func(transaction);
+            return [2 /*return*/];
+        });
+    }); });
+}
+exports.firesTransaction = firesTransaction;
 //# sourceMappingURL=index.js.map

@@ -1,6 +1,10 @@
 import firebase from "firebase";
-import { QuerySnapshot } from "@google-cloud/firestore";
 const firestore = firebase.firestore();
+
+/** Relative increment */
+export function firesIncrementBy(number: number): number {
+  return firebase.firestore.FieldValue.increment(number) as any;
+}
 
 /** Fetch the document */
 export async function firesdoc<Data>(docpath: string) {
@@ -69,7 +73,7 @@ export async function firescol<Data>(
     if (query?.orderBy) base = base.orderBy(query.orderBy[0], query.orderBy[1]);
     if (query?.where) base = base.where(query.where[0], query.where[1], query.where[2]);
 
-    const querySnap = (await base.get()) as QuerySnapshot<Data>;
+    const querySnap = (await base.get()) as firebase.firestore.QuerySnapshot<Data>;
     if (querySnap.empty)
       return Promise.reject({ code: 404, message: "Not Found!", nonexistent: true });
 
@@ -108,4 +112,10 @@ export async function firesbatch<Data>(
   } catch (err) {
     return Promise.reject();
   }
+}
+
+export function firesTransaction(func: (transaction: firebase.firestore.Transaction) => unknown) {
+  firestore.runTransaction(async (transaction) => {
+    func(transaction);
+  });
 }

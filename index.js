@@ -55,9 +55,14 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.firesbatch = exports.firescol = exports.firesdocrt = exports.firesdocup = exports.firesdoc = void 0;
+exports.firesTransaction = exports.firesbatch = exports.firescol = exports.firesdocrt = exports.firesdocup = exports.firesdoc = exports.firesIncrementBy = void 0;
 var admin = __importStar(require("firebase-admin"));
 var firestore = admin.firestore();
+/** Relative increment */
+function firesIncrementBy(number) {
+    return admin.firestore.FieldValue.increment(number);
+}
+exports.firesIncrementBy = firesIncrementBy;
 /** Fetch the document */
 function firesdoc(docpath) {
     return __awaiter(this, void 0, void 0, function () {
@@ -206,8 +211,14 @@ function firesbatch(args) {
     });
 }
 exports.firesbatch = firesbatch;
-// export function firesTransaction() {
-// firestore.runTransaction(transaction => {
-// })
-// }
+function firesTransaction(func) {
+    var _this = this;
+    firestore.runTransaction(function (transaction) { return __awaiter(_this, void 0, void 0, function () {
+        return __generator(this, function (_a) {
+            func(transaction);
+            return [2 /*return*/];
+        });
+    }); }, { maxAttempts: 3 });
+}
+exports.firesTransaction = firesTransaction;
 //# sourceMappingURL=index.js.map
