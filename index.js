@@ -171,8 +171,16 @@ function firescol(colpath, query) {
                         base = base.offset(query.offset);
                     if (query === null || query === void 0 ? void 0 : query.orderBy)
                         base = base.orderBy(query.orderBy[0], query.orderBy[1]);
-                    if (query === null || query === void 0 ? void 0 : query.where)
-                        base = base.where(query.where[0], query.where[1], query.where[2]);
+                    if (query === null || query === void 0 ? void 0 : query.where) {
+                        if (Array.isArray(query.where[0])) {
+                            query.where.forEach(function (_where) {
+                                base = base.where(_where[0], _where[1], _where[2]);
+                            });
+                        }
+                        else {
+                            base = base.where(query.where[0], query.where[1], query.where[2]);
+                        }
+                    }
                     return [4 /*yield*/, base.get()];
                 case 1:
                     querySnap = (_a.sent());
