@@ -174,6 +174,8 @@ function firescol(colpath, query) {
                     if (query === null || query === void 0 ? void 0 : query.where) {
                         if (Array.isArray(query.where[0])) {
                             query.where.forEach(function (_where) {
+                                if (!_where)
+                                    return;
                                 base = base.where(_where[0], _where[1], _where[2]);
                             });
                         }
