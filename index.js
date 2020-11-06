@@ -172,7 +172,7 @@ function firescol(colpath, query) {
                     if (query === null || query === void 0 ? void 0 : query.orderBy)
                         base = base.orderBy(query.orderBy[0], query.orderBy[1]);
                     if (query === null || query === void 0 ? void 0 : query.where) {
-                        if (Array.isArray(query.where[0])) {
+                        if (Array.isArray(query.where)) {
                             query.where.forEach(function (_where) {
                                 if (!_where)
                                     return;
