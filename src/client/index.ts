@@ -79,9 +79,9 @@ export async function firescol<Data>(
     orderBy?: [keyof Data, "desc" | "asc"];
     where?:
       | [keyof Data, "<" | "<=" | "==" | ">=" | ">", any]
-      | [keyof Data, "<" | "<=" | "==" | ">=" | ">", any][]
+      | [keyof Data, "<" | "<=" | "==" | ">=" | ">", any]
       | [keyof Data, "array-contains" | "in" | "array-contains-any", any[]]
-      | [keyof Data, "array-contains" | "in" | "array-contains-any", any[]][]
+      | [keyof Data, "array-contains" | "in" | "array-contains-any", any[]]
       | (
           | [keyof Data, "<" | "<=" | "==" | ">=" | ">", any]
           | [keyof Data, "<" | "<=" | "==" | ">=" | ">", any]
@@ -96,9 +96,9 @@ export async function firescol<Data>(
     if (query?.offset) base = base.offset(query.offset);
     if (query?.orderBy) base = base.orderBy(query.orderBy[0], query.orderBy[1]);
     if (query?.where) {
-      if (Array.isArray(query.where)) {
+      if (Array.isArray(query.where[0])) {
         query.where.forEach((_where) => {
-          if (!_where) return;
+          if (!_where[0]) return;
           base = base.where(_where[0], _where[1], _where[2]);
         });
       } else {

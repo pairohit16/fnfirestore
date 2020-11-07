@@ -172,9 +172,9 @@ function firescol(colpath, query) {
                     if (query === null || query === void 0 ? void 0 : query.orderBy)
                         base = base.orderBy(query.orderBy[0], query.orderBy[1]);
                     if (query === null || query === void 0 ? void 0 : query.where) {
-                        if (Array.isArray(query.where)) {
+                        if (Array.isArray(query.where[0])) {
                             query.where.forEach(function (_where) {
-                                if (!_where)
+                                if (!_where[0])
                                     return;
                                 base = base.where(_where[0], _where[1], _where[2]);
                             });
@@ -191,6 +191,7 @@ function firescol(colpath, query) {
                     return [2 /*return*/, querySnap.docs.map(function (doc) { return doc.data(); })];
                 case 2:
                     err_4 = _a.sent();
+                    console.log({ err: err_4 });
                     return [2 /*return*/, Promise.reject()];
                 case 3: return [2 /*return*/];
             }
