@@ -63,6 +63,17 @@ export async function firesdocrt<Data>(docpath: string, create: Data) {
   }
 }
 
+export type FirescolWhere<Data> =
+  | [keyof Data, "<" | "<=" | "==" | ">=" | ">" | "!=", any]
+  | [keyof Data, "<" | "<=" | "==" | ">=" | ">" | "!=", any]
+  | [keyof Data, "array-contains" | "in" | "not-in" | "array-contains-any", any[]]
+  | [keyof Data, "array-contains" | "in" | "not-in" | "array-contains-any", any[]]
+  | (
+      | [keyof Data, "<" | "<=" | "==" | ">=" | ">" | "!=", any]
+      | [keyof Data, "<" | "<=" | "==" | ">=" | ">" | "!=", any]
+      | [keyof Data, "array-contains" | "in" | "not-in" | "array-contains-any", any[]]
+      | [keyof Data, "array-contains" | "in" | "not-in" | "array-contains-any", any[]]
+    )[];
 /**
  * Query firestore collection
  * @param colpath firestore collection path
@@ -74,17 +85,7 @@ export async function firescol<Data>(
     limit?: number;
     offset?: number;
     orderBy?: [keyof Data, "desc" | "asc"];
-    where?:
-      | [keyof Data, "<" | "<=" | "==" | ">=" | ">" | "!=", any]
-      | [keyof Data, "<" | "<=" | "==" | ">=" | ">" | "!=", any]
-      | [keyof Data, "array-contains" | "in" | "not-in" | "array-contains-any", any[]]
-      | [keyof Data, "array-contains" | "in" | "not-in" | "array-contains-any", any[]]
-      | (
-          | [keyof Data, "<" | "<=" | "==" | ">=" | ">" | "!=", any]
-          | [keyof Data, "<" | "<=" | "==" | ">=" | ">" | "!=", any]
-          | [keyof Data, "array-contains" | "in" | "not-in" | "array-contains-any", any[]]
-          | [keyof Data, "array-contains" | "in" | "not-in" | "array-contains-any", any[]]
-        )[];
+    where?: FirescolWhere<Data>;
   }
 ) {
   try {
@@ -114,14 +115,13 @@ export async function firescol<Data>(
   }
 }
 
+export type FiresbatchArgs<Data> = (
+  | [docpath: string, operation: "create", data: Data]
+  | [docpath: string, operation: "update", data: PartialDeep<Data>, pure?: boolean]
+  | [docpath: string, operation: "delete"]
+)[];
 /** Batch firestore function */
-export async function firesbatch<Data>(
-  args: (
-    | [docpath: string, operation: "create", data: Data]
-    | [docpath: string, operation: "update", data: PartialDeep<Data>, pure?: boolean]
-    | [docpath: string, operation: "delete"]
-  )[]
-) {
+export async function firesbatch<Data>(args: FiresbatchArgs<Data>) {
   try {
     const batch = firestore.batch();
     args.forEach((arg) => {
@@ -149,7 +149,7 @@ export async function firesbatch<Data>(
   }
 }
 
-interface Transaction {
+export interface Transaction {
   get<Data>(docpath: string): Promise<Data>;
   update<Data>(docpath: string, data: PartialDeep<Data>, pure?: boolean): void;
   create<Data>(docpath: string, data: Data): void;

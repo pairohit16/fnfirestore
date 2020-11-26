@@ -66,56 +66,6 @@ export async function firesdocrt<Data>(docpath: string, create: Data) {
   }
 }
 
-/**
- * Query firestore collection
- * @param colpath firestore collection path
- * @param query querys to filter collections
- */
-export async function firescol<Data>(
-  colpath: string,
-  query?: {
-    limit?: number;
-    offset?: number;
-    orderBy?: [keyof Data, "desc" | "asc"];
-    where?:
-      | [keyof Data, "<" | "<=" | "==" | ">=" | ">" | "!=", any]
-      | [keyof Data, "<" | "<=" | "==" | ">=" | ">" | "!=", any]
-      | [keyof Data, "array-contains" | "in" | "not-in" | "array-contains-any", any[]]
-      | [keyof Data, "array-contains" | "in" | "not-in" | "array-contains-any", any[]]
-      | (
-          | [keyof Data, "<" | "<=" | "==" | ">=" | ">" | "!=", any]
-          | [keyof Data, "<" | "<=" | "==" | ">=" | ">" | "!=", any]
-          | [keyof Data, "array-contains" | "in" | "not-in" | "array-contains-any", any[]]
-          | [keyof Data, "array-contains" | "in" | "not-in" | "array-contains-any", any[]]
-        )[];
-  }
-) {
-  try {
-    var base: any = firestore.collection(colpath);
-    if (query?.limit) base = base.limit(query.limit);
-    if (query?.offset) base = base.offset(query.offset);
-    if (query?.orderBy) base = base.orderBy(query.orderBy[0], query.orderBy[1]);
-    if (query?.where) {
-      if (Array.isArray(query.where[0])) {
-        query.where.forEach((_where) => {
-          if (!_where[0]) return;
-          base = base.where(_where[0], _where[1], _where[2]);
-        });
-      } else {
-        base = base.where(query.where[0], query.where[1], query.where[2]);
-      }
-    }
-
-    const querySnap = (await base.get()) as firebase.firestore.QuerySnapshot<Data>;
-    if (querySnap.empty)
-      return Promise.reject({ code: 404, message: "Not Found!", nonexistent: true });
-
-    return querySnap.docs.map((doc) => doc.data());
-  } catch (err) {
-    return Promise.reject();
-  }
-}
-
 /** Batch firestore function */
 export async function firesbatch<Data>(
   args: (
@@ -147,7 +97,7 @@ export async function firesbatch<Data>(
   }
 }
 
-interface Transaction {
+export interface Transaction {
   get<Data>(docpath: string): Promise<Data>;
   update<Data>(docpath: string, data: PartialDeep<Data>, pure?: boolean): void;
   delete(docpath: string): void;

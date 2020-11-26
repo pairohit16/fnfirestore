@@ -16,25 +16,13 @@ export declare function firesdocup<Data>(docpath: string, update: PartialDeep<Da
 pure?: boolean): Promise<void>;
 /** Create the document */
 export declare function firesdocrt<Data>(docpath: string, create: Data): Promise<Data>;
-/**
- * Query firestore collection
- * @param colpath firestore collection path
- * @param query querys to filter collections
- */
-export declare function firescol<Data>(colpath: string, query?: {
-    limit?: number;
-    offset?: number;
-    orderBy?: [keyof Data, "desc" | "asc"];
-    where?: [keyof Data, "<" | "<=" | "==" | ">=" | ">" | "!=", any] | [keyof Data, "<" | "<=" | "==" | ">=" | ">" | "!=", any] | [keyof Data, "array-contains" | "in" | "not-in" | "array-contains-any", any[]] | [keyof Data, "array-contains" | "in" | "not-in" | "array-contains-any", any[]] | ([keyof Data, "<" | "<=" | "==" | ">=" | ">" | "!=", any] | [keyof Data, "<" | "<=" | "==" | ">=" | ">" | "!=", any] | [keyof Data, "array-contains" | "in" | "not-in" | "array-contains-any", any[]] | [keyof Data, "array-contains" | "in" | "not-in" | "array-contains-any", any[]])[];
-}): Promise<Data[]>;
 /** Batch firestore function */
 export declare function firesbatch<Data>(args: ([docpath: string, operation: "update", data: PartialDeep<Data>, pure?: boolean] | [docpath: string, operation: "delete"])[]): Promise<void>;
-interface Transaction {
+export interface Transaction {
     get<Data>(docpath: string): Promise<Data>;
     update<Data>(docpath: string, data: PartialDeep<Data>, pure?: boolean): void;
     delete(docpath: string): void;
 }
 /** Transaction */
 export declare function firesTransaction(func: (transaction: Transaction) => unknown): Promise<void>;
-export {};
 //# sourceMappingURL=index.d.ts.map

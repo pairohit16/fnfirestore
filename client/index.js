@@ -39,7 +39,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.firesTransaction = exports.firesbatch = exports.firescol = exports.firesdocrt = exports.firesdocup = exports.firesdoc = exports.firesColRef = exports.firesDocRef = exports.firesArrayUnion = exports.firesIncrementBy = void 0;
+exports.firesTransaction = exports.firesbatch = exports.firesdocrt = exports.firesdocup = exports.firesdoc = exports.firesColRef = exports.firesDocRef = exports.firesArrayUnion = exports.firesIncrementBy = void 0;
 var firebase_1 = __importDefault(require("firebase"));
 var firestore = firebase_1.default.firestore();
 /** Relative increment */
@@ -141,56 +141,10 @@ function firesdocrt(docpath, create) {
     });
 }
 exports.firesdocrt = firesdocrt;
-/**
- * Query firestore collection
- * @param colpath firestore collection path
- * @param query querys to filter collections
- */
-function firescol(colpath, query) {
-    return __awaiter(this, void 0, void 0, function () {
-        var base, querySnap, err_4;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0:
-                    _a.trys.push([0, 2, , 3]);
-                    base = firestore.collection(colpath);
-                    if (query === null || query === void 0 ? void 0 : query.limit)
-                        base = base.limit(query.limit);
-                    if (query === null || query === void 0 ? void 0 : query.offset)
-                        base = base.offset(query.offset);
-                    if (query === null || query === void 0 ? void 0 : query.orderBy)
-                        base = base.orderBy(query.orderBy[0], query.orderBy[1]);
-                    if (query === null || query === void 0 ? void 0 : query.where) {
-                        if (Array.isArray(query.where[0])) {
-                            query.where.forEach(function (_where) {
-                                if (!_where[0])
-                                    return;
-                                base = base.where(_where[0], _where[1], _where[2]);
-                            });
-                        }
-                        else {
-                            base = base.where(query.where[0], query.where[1], query.where[2]);
-                        }
-                    }
-                    return [4 /*yield*/, base.get()];
-                case 1:
-                    querySnap = (_a.sent());
-                    if (querySnap.empty)
-                        return [2 /*return*/, Promise.reject({ code: 404, message: "Not Found!", nonexistent: true })];
-                    return [2 /*return*/, querySnap.docs.map(function (doc) { return doc.data(); })];
-                case 2:
-                    err_4 = _a.sent();
-                    return [2 /*return*/, Promise.reject()];
-                case 3: return [2 /*return*/];
-            }
-        });
-    });
-}
-exports.firescol = firescol;
 /** Batch firestore function */
 function firesbatch(args) {
     return __awaiter(this, void 0, void 0, function () {
-        var batch_1, err_5;
+        var batch_1, err_4;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
@@ -216,7 +170,7 @@ function firesbatch(args) {
                     _a.sent();
                     return [2 /*return*/, Promise.resolve()];
                 case 2:
-                    err_5 = _a.sent();
+                    err_4 = _a.sent();
                     return [2 /*return*/, Promise.reject()];
                 case 3: return [2 /*return*/];
             }
@@ -227,7 +181,7 @@ exports.firesbatch = firesbatch;
 /** Transaction */
 function firesTransaction(func) {
     return __awaiter(this, void 0, void 0, function () {
-        var err_6;
+        var err_5;
         var _this = this;
         return __generator(this, function (_a) {
             switch (_a.label) {
@@ -269,7 +223,7 @@ function firesTransaction(func) {
                     _a.sent();
                     return [3 /*break*/, 3];
                 case 2:
-                    err_6 = _a.sent();
+                    err_5 = _a.sent();
                     throw { code: 404, message: "Failed, Please try again!" };
                 case 3: return [2 /*return*/];
             }

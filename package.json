@@ -1,9 +1,9 @@
 {
   "name": "@pairohit/fnfirestore",
-  "version": "1.0.543",
+  "version": "1.0.55",
   "description": "cleaner function for firestore",
   "main": ".",
-  "types": "./index.d.ts",
+  "types": ".",
   "author": "PaiRohit",
   "license": "MIT",
   "homepage": "https://github.com/pairohit16/fnfirestore",
@@ -26,13 +26,12 @@
     "publish:npm": "npm publish"
   },
   "peerDependencies": {
-    "firebase-admin": "9.2.0",
-    "firebase": "^8.0.0"
+    "firebase-admin": "*",
+    "firebase": "*"
   },
   "devDependencies": {
-    "firebase": "^8.0.0",
-    "firebase-admin": "^9.2.0",
+    "firebase": "*",
+    "firebase-admin": "*",
     "typescript": "^4.0.5"
-  },
-  "dependencies": {}
+  }
 }
