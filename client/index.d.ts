@@ -10,12 +10,20 @@ export declare function firesDocRef<Data>(docpath: string): firebase.firestore.D
 export declare function firesColRef<Data>(colpath: string): firebase.firestore.CollectionReference<Data>;
 /** Fetch the document */
 export declare function firesdoc<Data>(docpath: string): Promise<Data>;
+/** Fetch the document (realtime database) */
+export declare function rbdoc<Data>(docpath: string): Promise<Data>;
+/** Update the document (realtime database) */
+export declare function rbdocup<Data>(docpath: string, update: Data): Promise<void>;
+/** Get the collection (realtime database) */
+export declare function rbcol<Data>(colpath: string): Promise<Data[]>;
 /** Update the document */
 export declare function firesdocup<Data>(docpath: string, update: PartialDeep<Data>, 
 /** if enabled, on document don't exist it will throw an error */
 pure?: boolean): Promise<void>;
 /** Create the document */
 export declare function firesdocrt<Data>(docpath: string, create: Data): Promise<Data>;
+/** Delete the document */
+export declare function firesdocdel(docpath: string): Promise<void>;
 /** Batch firestore function */
 export declare function firesbatch<Data>(args: ([docpath: string, operation: "update", data: PartialDeep<Data>, pure?: boolean] | [docpath: string, operation: "delete"])[]): Promise<void>;
 export interface Transaction {

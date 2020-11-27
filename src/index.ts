@@ -63,6 +63,16 @@ export async function firesdocrt<Data>(docpath: string, create: Data) {
   }
 }
 
+/** Delete the document */
+export async function firesdocdel(docpath: string) {
+  try {
+    await firestore.doc(docpath).delete();
+    return Promise.resolve();
+  } catch (err) {
+    return Promise.reject();
+  }
+}
+
 export type FirescolWhere<Data> =
   | [keyof Data, "<" | "<=" | "==" | ">=" | ">" | "!=", any]
   | [keyof Data, "<" | "<=" | "==" | ">=" | ">" | "!=", any]
@@ -110,7 +120,6 @@ export async function firescol<Data>(
 
     return querySnap.docs.map((doc) => doc.data());
   } catch (err) {
-    console.log({ err });
     return Promise.reject();
   }
 }

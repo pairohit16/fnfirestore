@@ -34,6 +34,41 @@ export async function firesdoc<Data>(docpath: string) {
   }
 }
 
+/** Fetch the document (realtime database) */
+export async function rbdoc<Data>(docpath: string) {
+  try {
+    const ref = await firebase.database().ref(docpath).once("value");
+    if (!ref.exists())
+      return Promise.reject({ code: 404, message: "Not Found!", nonexistent: true });
+
+    return ref.val() as Data;
+  } catch (err) {
+    return Promise.reject();
+  }
+}
+
+/** Update the document (realtime database) */
+export async function rbdocup<Data>(docpath: string, update: Data) {
+  try {
+    await firebase.database().ref(docpath).set(update);
+
+    return Promise.resolve();
+  } catch (err) {
+    return Promise.reject();
+  }
+}
+
+/** Get the collection (realtime database) */
+export async function rbcol<Data>(colpath: string) {
+  try {
+    const refs = await firebase.database().ref(colpath).once("value");
+    return Object.values(refs.val()) as Data[];
+  } catch (error) {
+    return Promise.reject();
+  }
+}
+
+// export async
 /** Update the document */
 export async function firesdocup<Data>(
   docpath: string,
@@ -65,7 +100,15 @@ export async function firesdocrt<Data>(docpath: string, create: Data) {
     return Promise.reject();
   }
 }
-
+/** Delete the document */
+export async function firesdocdel(docpath: string) {
+  try {
+    await firestore.doc(docpath).delete();
+    return Promise.resolve();
+  } catch (err) {
+    return Promise.reject();
+  }
+}
 /** Batch firestore function */
 export async function firesbatch<Data>(
   args: (

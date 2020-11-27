@@ -55,7 +55,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.firesTransaction = exports.firesbatch = exports.firescol = exports.firesdocrt = exports.firesdocup = exports.firesdoc = exports.firesColRef = exports.firesDocRef = exports.firesArrayUnion = exports.firesIncrementBy = void 0;
+exports.firesTransaction = exports.firesbatch = exports.firescol = exports.firesdocdel = exports.firesdocrt = exports.firesdocup = exports.firesdoc = exports.firesColRef = exports.firesDocRef = exports.firesArrayUnion = exports.firesIncrementBy = void 0;
 var admin = __importStar(require("firebase-admin"));
 var firestore = admin.firestore();
 /** Relative increment */
@@ -152,6 +152,27 @@ function firesdocrt(docpath, create) {
     });
 }
 exports.firesdocrt = firesdocrt;
+/** Delete the document */
+function firesdocdel(docpath) {
+    return __awaiter(this, void 0, void 0, function () {
+        var err_4;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    _a.trys.push([0, 2, , 3]);
+                    return [4 /*yield*/, firestore.doc(docpath).delete()];
+                case 1:
+                    _a.sent();
+                    return [2 /*return*/, Promise.resolve()];
+                case 2:
+                    err_4 = _a.sent();
+                    return [2 /*return*/, Promise.reject()];
+                case 3: return [2 /*return*/];
+            }
+        });
+    });
+}
+exports.firesdocdel = firesdocdel;
 /**
  * Query firestore collection
  * @param colpath firestore collection path
@@ -159,7 +180,7 @@ exports.firesdocrt = firesdocrt;
  */
 function firescol(colpath, query) {
     return __awaiter(this, void 0, void 0, function () {
-        var base, querySnap, err_4;
+        var base, querySnap, err_5;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
@@ -190,8 +211,7 @@ function firescol(colpath, query) {
                         return [2 /*return*/, Promise.reject({ code: 404, message: "Not Found!", nonexistent: true })];
                     return [2 /*return*/, querySnap.docs.map(function (doc) { return doc.data(); })];
                 case 2:
-                    err_4 = _a.sent();
-                    console.log({ err: err_4 });
+                    err_5 = _a.sent();
                     return [2 /*return*/, Promise.reject()];
                 case 3: return [2 /*return*/];
             }
@@ -202,7 +222,7 @@ exports.firescol = firescol;
 /** Batch firestore function */
 function firesbatch(args) {
     return __awaiter(this, void 0, void 0, function () {
-        var batch_1, err_5;
+        var batch_1, err_6;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
@@ -231,7 +251,7 @@ function firesbatch(args) {
                     _a.sent();
                     return [2 /*return*/, Promise.resolve()];
                 case 2:
-                    err_5 = _a.sent();
+                    err_6 = _a.sent();
                     return [2 /*return*/, Promise.reject()];
                 case 3: return [2 /*return*/];
             }
@@ -242,7 +262,7 @@ exports.firesbatch = firesbatch;
 /** Transaction */
 function firesTransaction(func) {
     return __awaiter(this, void 0, void 0, function () {
-        var err_6;
+        var err_7;
         var _this = this;
         return __generator(this, function (_a) {
             switch (_a.label) {
@@ -287,7 +307,7 @@ function firesTransaction(func) {
                     _a.sent();
                     return [3 /*break*/, 3];
                 case 2:
-                    err_6 = _a.sent();
+                    err_7 = _a.sent();
                     throw { code: 404, message: "Failed, Please try again!" };
                 case 3: return [2 /*return*/];
             }

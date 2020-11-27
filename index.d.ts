@@ -15,6 +15,8 @@ export declare function firesdocup<Data>(docpath: string, update: PartialDeep<Da
 pure?: boolean): Promise<void>;
 /** Create the document */
 export declare function firesdocrt<Data>(docpath: string, create: Data): Promise<Data>;
+/** Delete the document */
+export declare function firesdocdel(docpath: string): Promise<void>;
 export declare type FirescolWhere<Data> = [keyof Data, "<" | "<=" | "==" | ">=" | ">" | "!=", any] | [keyof Data, "<" | "<=" | "==" | ">=" | ">" | "!=", any] | [keyof Data, "array-contains" | "in" | "not-in" | "array-contains-any", any[]] | [keyof Data, "array-contains" | "in" | "not-in" | "array-contains-any", any[]] | ([keyof Data, "<" | "<=" | "==" | ">=" | ">" | "!=", any] | [keyof Data, "<" | "<=" | "==" | ">=" | ">" | "!=", any] | [keyof Data, "array-contains" | "in" | "not-in" | "array-contains-any", any[]] | [keyof Data, "array-contains" | "in" | "not-in" | "array-contains-any", any[]])[];
 /**
  * Query firestore collection
