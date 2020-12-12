@@ -55,7 +55,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.firesTransaction = exports.firesbatch = exports.firescol = exports.firesdocdel = exports.firesdocrt = exports.firesdocup = exports.firesdoc = exports.firesColRef = exports.firesDocRef = exports.firesArrayUnion = exports.firesIncrementBy = void 0;
+exports.firesTransaction = exports.firesbatch = exports.firescol = exports.firesdocdel = exports.firesdocrt = exports.firesdocup = exports.isfiresdoc = exports.firesdoc = exports.firesColRef = exports.firesDocRef = exports.firesArrayUnion = exports.firesIncrementBy = void 0;
 var admin = __importStar(require("firebase-admin"));
 var firestore = admin.firestore();
 /** Relative increment */
@@ -102,6 +102,27 @@ function firesdoc(docpath) {
     });
 }
 exports.firesdoc = firesdoc;
+/** check weather document exists */
+function isfiresdoc(docpath) {
+    return __awaiter(this, void 0, void 0, function () {
+        var snap, _a;
+        return __generator(this, function (_b) {
+            switch (_b.label) {
+                case 0:
+                    _b.trys.push([0, 2, , 3]);
+                    return [4 /*yield*/, firestore.doc(docpath).get()];
+                case 1:
+                    snap = _b.sent();
+                    return [2 /*return*/, snap.exists];
+                case 2:
+                    _a = _b.sent();
+                    return [2 /*return*/, false];
+                case 3: return [2 /*return*/];
+            }
+        });
+    });
+}
+exports.isfiresdoc = isfiresdoc;
 /** Update the document */
 function firesdocup(docpath, update, 
 /** if enabled, on document don't exist it will throw an error */

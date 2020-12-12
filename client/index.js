@@ -39,7 +39,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.firesTransaction = exports.firesbatch = exports.firesdocdel = exports.firesdocrt = exports.firesdocup = exports.rbcol = exports.rbdocup = exports.rbdoc = exports.firesdoc = exports.firesColRef = exports.firesDocRef = exports.firesArrayUnion = exports.firesIncrementBy = void 0;
+exports.firesTransaction = exports.firesbatch = exports.firesdocdel = exports.firesdocrt = exports.firesdocup = exports.rbcol = exports.rbdocup = exports.rbdoc = exports.isfiresdoc = exports.firesdoc = exports.firesColRef = exports.firesDocRef = exports.firesArrayUnion = exports.firesIncrementBy = void 0;
 var firebase_1 = __importDefault(require("firebase"));
 var firestore = firebase_1.default.firestore();
 /** Relative increment */
@@ -86,6 +86,27 @@ function firesdoc(docpath) {
     });
 }
 exports.firesdoc = firesdoc;
+/** check weather document exists */
+function isfiresdoc(docpath) {
+    return __awaiter(this, void 0, void 0, function () {
+        var snap, _a;
+        return __generator(this, function (_b) {
+            switch (_b.label) {
+                case 0:
+                    _b.trys.push([0, 2, , 3]);
+                    return [4 /*yield*/, firestore.doc(docpath).get()];
+                case 1:
+                    snap = _b.sent();
+                    return [2 /*return*/, snap.exists];
+                case 2:
+                    _a = _b.sent();
+                    return [2 /*return*/, false];
+                case 3: return [2 /*return*/];
+            }
+        });
+    });
+}
+exports.isfiresdoc = isfiresdoc;
 /** Fetch the document (realtime database) */
 function rbdoc(docpath) {
     return __awaiter(this, void 0, void 0, function () {

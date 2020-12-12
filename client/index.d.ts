@@ -10,6 +10,8 @@ export declare function firesDocRef<Data>(docpath: string): firebase.firestore.D
 export declare function firesColRef<Data>(colpath: string): firebase.firestore.CollectionReference<Data>;
 /** Fetch the document */
 export declare function firesdoc<Data>(docpath: string): Promise<Data>;
+/** check weather document exists */
+export declare function isfiresdoc<Data>(docpath: string): Promise<boolean>;
 /** Fetch the document (realtime database) */
 export declare function rbdoc<Data>(docpath: string): Promise<Data>;
 /** Update the document (realtime database) */

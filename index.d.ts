@@ -9,6 +9,8 @@ export declare function firesDocRef<Data>(docpath: string): FirebaseFirestore.Do
 export declare function firesColRef<Data>(colpath: string): FirebaseFirestore.CollectionReference<Data>;
 /** Fetch the document */
 export declare function firesdoc<Data>(docpath: string): Promise<Data>;
+/** check weather document exists */
+export declare function isfiresdoc<Data>(docpath: string): Promise<boolean>;
 /** Update the document */
 export declare function firesdocup<Data>(docpath: string, update: PartialDeep<Data>, 
 /** if enabled, on document don't exist it will throw an error */

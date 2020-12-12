@@ -34,6 +34,16 @@ export async function firesdoc<Data>(docpath: string) {
   }
 }
 
+/** check weather document exists */
+export async function isfiresdoc<Data>(docpath: string) {
+  try {
+    const snap = await firestore.doc(docpath).get();
+    return snap.exists;
+  } catch {
+    return false;
+  }
+}
+
 /** Update the document */
 export async function firesdocup<Data>(
   docpath: string,
