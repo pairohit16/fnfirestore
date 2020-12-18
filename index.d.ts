@@ -19,7 +19,23 @@ pure?: boolean): Promise<void>;
 export declare function firesdocrt<Data>(docpath: string, create: Data): Promise<Data>;
 /** Delete the document */
 export declare function firesdocdel(docpath: string): Promise<void>;
-export declare type FirescolWhere<Data> = [keyof Data, "<" | "<=" | "==" | ">=" | ">" | "!=", any] | [keyof Data, "<" | "<=" | "==" | ">=" | ">" | "!=", any] | [keyof Data, "array-contains" | "in" | "not-in" | "array-contains-any", any[]] | [keyof Data, "array-contains" | "in" | "not-in" | "array-contains-any", any[]] | ([keyof Data, "<" | "<=" | "==" | ">=" | ">" | "!=", any] | [keyof Data, "<" | "<=" | "==" | ">=" | ">" | "!=", any] | [keyof Data, "array-contains" | "in" | "not-in" | "array-contains-any", any[]] | [keyof Data, "array-contains" | "in" | "not-in" | "array-contains-any", any[]])[];
+export declare type FirescolWhere<Data> = [keyof Data, "<" | "<=" | "==" | ">=" | ">" | "!=", any] | [keyof Data, "<" | "<=" | "==" | ">=" | ">" | "!=", any] | [
+    keyof Data,
+    "array-contains" | "in" | "not-in" | "array-contains-any",
+    any[]
+] | [
+    keyof Data,
+    "array-contains" | "in" | "not-in" | "array-contains-any",
+    any[]
+] | ([keyof Data, "<" | "<=" | "==" | ">=" | ">" | "!=", any] | [keyof Data, "<" | "<=" | "==" | ">=" | ">" | "!=", any] | [
+    keyof Data,
+    "array-contains" | "in" | "not-in" | "array-contains-any",
+    any[]
+] | [
+    keyof Data,
+    "array-contains" | "in" | "not-in" | "array-contains-any",
+    any[]
+])[];
 /**
  * Query firestore collection
  * @param colpath firestore collection path
@@ -31,7 +47,12 @@ export declare function firescol<Data>(colpath: string, query?: {
     orderBy?: [keyof Data, "desc" | "asc"];
     where?: FirescolWhere<Data>;
 }): Promise<Data[]>;
-export declare type FiresbatchArgs<Data> = ([docpath: string, operation: "create", data: Data] | [docpath: string, operation: "update", data: PartialDeep<Data>, pure?: boolean] | [docpath: string, operation: "delete"])[];
+export declare type FiresbatchArgs<Data> = ([docpath: string, operation: "create", data: Data] | [
+    docpath: string,
+    operation: "update",
+    data: PartialDeep<Data>,
+    pure?: boolean
+] | [docpath: string, operation: "delete"])[];
 /** Batch firestore function */
 export declare function firesbatch<Data>(args: FiresbatchArgs<Data>): Promise<void>;
 export interface Transaction {
@@ -41,5 +62,5 @@ export interface Transaction {
     delete(docpath: string): void;
 }
 /** Transaction */
-export declare function firesTransaction(func: (transaction: Transaction) => unknown): Promise<void>;
+export declare function firesTransaction(func: (transaction: Transaction) => unknown): Promise<unknown>;
 //# sourceMappingURL=index.d.ts.map

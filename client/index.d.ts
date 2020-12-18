@@ -27,12 +27,17 @@ export declare function firesdocrt<Data>(docpath: string, create: Data): Promise
 /** Delete the document */
 export declare function firesdocdel(docpath: string): Promise<void>;
 /** Batch firestore function */
-export declare function firesbatch<Data>(args: ([docpath: string, operation: "update", data: PartialDeep<Data>, pure?: boolean] | [docpath: string, operation: "delete"])[]): Promise<void>;
+export declare function firesbatch<Data>(args: ([
+    docpath: string,
+    operation: "update",
+    data: PartialDeep<Data>,
+    pure?: boolean
+] | [docpath: string, operation: "delete"])[]): Promise<void>;
 export interface Transaction {
     get<Data>(docpath: string): Promise<Data>;
     update<Data>(docpath: string, data: PartialDeep<Data>, pure?: boolean): void;
     delete(docpath: string): void;
 }
 /** Transaction */
-export declare function firesTransaction(func: (transaction: Transaction) => unknown): Promise<void>;
+export declare function firesTransaction(func: (transaction: Transaction) => unknown): Promise<unknown>;
 //# sourceMappingURL=index.d.ts.map

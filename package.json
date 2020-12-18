@@ -1,6 +1,6 @@
 {
   "name": "@pairohit/fnfirestore",
-  "version": "1.0.8",
+  "version": "1.0.81",
   "description": "cleaner function for firestore & realtime",
   "main": ".",
   "types": ".",
@@ -26,8 +26,8 @@
     "publish:npm": "npm publish"
   },
   "peerDependencies": {
-    "firebase-admin": "*",
-    "firebase": "*"
+    "firebase": "*",
+    "firebase-admin": "*"
   },
   "devDependencies": {
     "firebase": "*",

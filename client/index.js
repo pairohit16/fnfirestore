@@ -55,12 +55,16 @@ function firesArrayUnion(element) {
 exports.firesArrayUnion = firesArrayUnion;
 /** Document Reference */
 function firesDocRef(docpath) {
-    return firebase_1.default.firestore().doc(docpath);
+    return firebase_1.default
+        .firestore()
+        .doc(docpath);
 }
 exports.firesDocRef = firesDocRef;
 /** Collection Reference */
 function firesColRef(colpath) {
-    return firebase_1.default.firestore().collection(colpath);
+    return firebase_1.default
+        .firestore()
+        .collection(colpath);
 }
 exports.firesColRef = firesColRef;
 /** Fetch the document */
@@ -75,7 +79,11 @@ function firesdoc(docpath) {
                 case 1:
                     snap = _a.sent();
                     if (!snap.exists)
-                        return [2 /*return*/, Promise.reject({ code: 404, message: "Not Found!", nonexistent: true })];
+                        return [2 /*return*/, Promise.reject({
+                                code: 404,
+                                message: "Not Found!",
+                                nonexistent: true,
+                            })];
                     return [2 /*return*/, snap.data()];
                 case 2:
                     err_1 = _a.sent();
@@ -119,7 +127,11 @@ function rbdoc(docpath) {
                 case 1:
                     ref = _a.sent();
                     if (!ref.exists())
-                        return [2 /*return*/, Promise.reject({ code: 404, message: "Not Found!", nonexistent: true })];
+                        return [2 /*return*/, Promise.reject({
+                                code: 404,
+                                message: "Not Found!",
+                                nonexistent: true,
+                            })];
                     return [2 /*return*/, ref.val()];
                 case 2:
                     err_2 = _a.sent();
@@ -289,52 +301,42 @@ exports.firesbatch = firesbatch;
 /** Transaction */
 function firesTransaction(func) {
     return __awaiter(this, void 0, void 0, function () {
-        var err_8;
         var _this = this;
         return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0:
-                    _a.trys.push([0, 2, , 3]);
-                    return [4 /*yield*/, firestore.runTransaction(function (transaction) { return __awaiter(_this, void 0, void 0, function () {
-                            var trans;
-                            return __generator(this, function (_a) {
-                                trans = {
-                                    get: function (docpath) {
-                                        return __awaiter(this, void 0, void 0, function () {
-                                            var snap;
-                                            return __generator(this, function (_a) {
-                                                switch (_a.label) {
-                                                    case 0: return [4 /*yield*/, transaction.get(firebase_1.default.firestore().doc(docpath))];
-                                                    case 1:
-                                                        snap = _a.sent();
-                                                        return [2 /*return*/, snap.data()];
-                                                }
-                                            });
-                                        });
-                                    },
-                                    update: function (docpath, data, pure) {
-                                        if (pure) {
-                                            transaction.update(firebase_1.default.firestore().doc(docpath), data);
+            return [2 /*return*/, firestore.runTransaction(function (transaction) { return __awaiter(_this, void 0, void 0, function () {
+                    var trans;
+                    return __generator(this, function (_a) {
+                        trans = {
+                            get: function (docpath) {
+                                return __awaiter(this, void 0, void 0, function () {
+                                    var snap;
+                                    return __generator(this, function (_a) {
+                                        switch (_a.label) {
+                                            case 0: return [4 /*yield*/, transaction.get(firebase_1.default.firestore().doc(docpath))];
+                                            case 1:
+                                                snap = _a.sent();
+                                                return [2 /*return*/, snap.data()];
                                         }
-                                        else {
-                                            transaction.set(firebase_1.default.firestore().doc(docpath), data, { merge: true });
-                                        }
-                                    },
-                                    delete: function (docpath) {
-                                        transaction.delete(firebase_1.default.firestore().doc(docpath));
-                                    },
-                                };
-                                return [2 /*return*/, func(trans)];
-                            });
-                        }); })];
-                case 1:
-                    _a.sent();
-                    return [3 /*break*/, 3];
-                case 2:
-                    err_8 = _a.sent();
-                    throw { code: 404, message: "Failed, Please try again!" };
-                case 3: return [2 /*return*/];
-            }
+                                    });
+                                });
+                            },
+                            update: function (docpath, data, pure) {
+                                if (pure) {
+                                    transaction.update(firebase_1.default.firestore().doc(docpath), data);
+                                }
+                                else {
+                                    transaction.set(firebase_1.default.firestore().doc(docpath), data, {
+                                        merge: true,
+                                    });
+                                }
+                            },
+                            delete: function (docpath) {
+                                transaction.delete(firebase_1.default.firestore().doc(docpath));
+                            },
+                        };
+                        return [2 /*return*/, func(trans)];
+                    });
+                }); })];
         });
     });
 }

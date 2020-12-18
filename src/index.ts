@@ -14,12 +14,16 @@ export function firesArrayUnion<Element>(element: Element[]): Element[] {
 
 /** Document Reference */
 export function firesDocRef<Data>(docpath: string) {
-  return admin.firestore().doc(docpath) as admin.firestore.DocumentReference<Data>;
+  return admin
+    .firestore()
+    .doc(docpath) as admin.firestore.DocumentReference<Data>;
 }
 
 /** Collection Reference */
 export function firesColRef<Data>(colpath: string) {
-  return admin.firestore().collection(colpath) as admin.firestore.CollectionReference<Data>;
+  return admin
+    .firestore()
+    .collection(colpath) as admin.firestore.CollectionReference<Data>;
 }
 
 /** Fetch the document */
@@ -27,7 +31,11 @@ export async function firesdoc<Data>(docpath: string) {
   try {
     const snap = await firestore.doc(docpath).get();
     if (!snap.exists)
-      return Promise.reject({ code: 404, message: "Not Found!", nonexistent: true });
+      return Promise.reject({
+        code: 404,
+        message: "Not Found!",
+        nonexistent: true,
+      });
     return snap.data() as Data;
   } catch (err) {
     return Promise.reject();
@@ -86,13 +94,29 @@ export async function firesdocdel(docpath: string) {
 export type FirescolWhere<Data> =
   | [keyof Data, "<" | "<=" | "==" | ">=" | ">" | "!=", any]
   | [keyof Data, "<" | "<=" | "==" | ">=" | ">" | "!=", any]
-  | [keyof Data, "array-contains" | "in" | "not-in" | "array-contains-any", any[]]
-  | [keyof Data, "array-contains" | "in" | "not-in" | "array-contains-any", any[]]
+  | [
+      keyof Data,
+      "array-contains" | "in" | "not-in" | "array-contains-any",
+      any[]
+    ]
+  | [
+      keyof Data,
+      "array-contains" | "in" | "not-in" | "array-contains-any",
+      any[]
+    ]
   | (
       | [keyof Data, "<" | "<=" | "==" | ">=" | ">" | "!=", any]
       | [keyof Data, "<" | "<=" | "==" | ">=" | ">" | "!=", any]
-      | [keyof Data, "array-contains" | "in" | "not-in" | "array-contains-any", any[]]
-      | [keyof Data, "array-contains" | "in" | "not-in" | "array-contains-any", any[]]
+      | [
+          keyof Data,
+          "array-contains" | "in" | "not-in" | "array-contains-any",
+          any[]
+        ]
+      | [
+          keyof Data,
+          "array-contains" | "in" | "not-in" | "array-contains-any",
+          any[]
+        ]
     )[];
 /**
  * Query firestore collection
@@ -126,7 +150,11 @@ export async function firescol<Data>(
 
     const querySnap = (await base.get()) as admin.firestore.QuerySnapshot<Data>;
     if (querySnap.empty)
-      return Promise.reject({ code: 404, message: "Not Found!", nonexistent: true });
+      return Promise.reject({
+        code: 404,
+        message: "Not Found!",
+        nonexistent: true,
+      });
 
     return querySnap.docs.map((doc) => doc.data());
   } catch (err) {
@@ -136,7 +164,12 @@ export async function firescol<Data>(
 
 export type FiresbatchArgs<Data> = (
   | [docpath: string, operation: "create", data: Data]
-  | [docpath: string, operation: "update", data: PartialDeep<Data>, pure?: boolean]
+  | [
+      docpath: string,
+      operation: "update",
+      data: PartialDeep<Data>,
+      pure?: boolean
+    ]
   | [docpath: string, operation: "delete"]
 )[];
 /** Batch firestore function */
@@ -176,39 +209,39 @@ export interface Transaction {
 }
 
 /** Transaction */
-export async function firesTransaction(func: (transaction: Transaction) => unknown) {
-  try {
-    await firestore.runTransaction(
-      async (transaction) => {
-        // my custom transaction
-        const trans: Transaction = {
-          async get<Data>(docpath: string) {
-            const snap = await transaction.get(admin.firestore().doc(docpath));
-            return snap.data() as Data;
-          },
+export async function firesTransaction(
+  func: (transaction: Transaction) => unknown
+) {
+  return firestore.runTransaction(
+    async (transaction) => {
+      // my custom transaction
+      const trans: Transaction = {
+        async get<Data>(docpath: string) {
+          const snap = await transaction.get(admin.firestore().doc(docpath));
+          return snap.data() as Data;
+        },
 
-          update<Data>(docpath: string, data: PartialDeep<Data>, pure?: boolean) {
-            if (pure) {
-              transaction.update(admin.firestore().doc(docpath), data);
-            } else {
-              transaction.set(admin.firestore().doc(docpath), data, { merge: true });
-            }
-          },
+        update<Data>(docpath: string, data: PartialDeep<Data>, pure?: boolean) {
+          if (pure) {
+            transaction.update(admin.firestore().doc(docpath), data);
+          } else {
+            transaction.set(admin.firestore().doc(docpath), data, {
+              merge: true,
+            });
+          }
+        },
 
-          create<Data>(docpath: string, data: Data) {
-            transaction.create(admin.firestore().doc(docpath), data);
-          },
+        create<Data>(docpath: string, data: Data) {
+          transaction.create(admin.firestore().doc(docpath), data);
+        },
 
-          delete(docpath: string) {
-            transaction.delete(admin.firestore().doc(docpath));
-          },
-        };
+        delete(docpath: string) {
+          transaction.delete(admin.firestore().doc(docpath));
+        },
+      };
 
-        return func(trans);
-      },
-      { maxAttempts: 3 }
-    );
-  } catch (err) {
-    throw { code: 404, message: "Failed, Please try again!" };
-  }
+      return func(trans);
+    },
+    { maxAttempts: 3 }
+  );
 }
