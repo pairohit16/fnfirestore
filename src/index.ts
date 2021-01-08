@@ -1,6 +1,7 @@
 import * as admin from "firebase-admin";
 import { PartialDeep } from "./custom-types";
 const firestore = admin.firestore();
+const realtime = admin.database();
 
 /** Relative increment */
 export function firesIncrementBy(number: number): number {
@@ -43,12 +44,61 @@ export async function firesdoc<Data>(docpath: string) {
 }
 
 /** check weather document exists */
-export async function isfiresdoc<Data>(docpath: string) {
+export async function isfiresdoc(docpath: string) {
   try {
     const snap = await firestore.doc(docpath).get();
     return snap.exists;
   } catch {
     return false;
+  }
+}
+
+/** Fetch the document (realtime database) */
+export async function rbdoc<Data>(docpath: string) {
+  try {
+    const ref = await realtime.ref(docpath).once("value");
+    if (!ref.exists())
+      return Promise.reject({
+        code: 404,
+        message: "Not Found!",
+        nonexistent: true,
+      });
+
+    return ref.val() as Data;
+  } catch (err) {
+    return Promise.reject();
+  }
+}
+
+/** Update the document (realtime database) */
+export async function rbdocup<Data>(docpath: string, update: Data) {
+  try {
+    await realtime.ref(docpath).set(update);
+
+    return Promise.resolve();
+  } catch (err) {
+    return Promise.reject();
+  }
+}
+
+/** Delete the document (realtime database) */
+export async function rbdocdel(docpath: string) {
+  try {
+    await realtime.ref(docpath).remove();
+
+    return Promise.resolve();
+  } catch (err) {
+    return Promise.reject();
+  }
+}
+
+/** Get the collection (realtime database) */
+export async function rbcol<Data>(colpath: string) {
+  try {
+    const refs = await realtime.ref(colpath).once("value");
+    return Object.values(refs.val()) as Data[];
+  } catch (error) {
+    return Promise.reject();
   }
 }
 
@@ -95,29 +145,29 @@ export type FirescolWhere<Data> =
   | [keyof Data, "<" | "<=" | "==" | ">=" | ">" | "!=", any]
   | [keyof Data, "<" | "<=" | "==" | ">=" | ">" | "!=", any]
   | [
-      keyof Data,
-      "array-contains" | "in" | "not-in" | "array-contains-any",
-      any[]
-    ]
+    keyof Data,
+    "array-contains" | "in" | "not-in" | "array-contains-any",
+    any[]
+  ]
   | [
+    keyof Data,
+    "array-contains" | "in" | "not-in" | "array-contains-any",
+    any[]
+  ]
+  | (
+    | [keyof Data, "<" | "<=" | "==" | ">=" | ">" | "!=", any]
+    | [keyof Data, "<" | "<=" | "==" | ">=" | ">" | "!=", any]
+    | [
       keyof Data,
       "array-contains" | "in" | "not-in" | "array-contains-any",
       any[]
     ]
-  | (
-      | [keyof Data, "<" | "<=" | "==" | ">=" | ">" | "!=", any]
-      | [keyof Data, "<" | "<=" | "==" | ">=" | ">" | "!=", any]
-      | [
-          keyof Data,
-          "array-contains" | "in" | "not-in" | "array-contains-any",
-          any[]
-        ]
-      | [
-          keyof Data,
-          "array-contains" | "in" | "not-in" | "array-contains-any",
-          any[]
-        ]
-    )[];
+    | [
+      keyof Data,
+      "array-contains" | "in" | "not-in" | "array-contains-any",
+      any[]
+    ]
+  )[];
 /**
  * Query firestore collection
  * @param colpath firestore collection path
@@ -165,11 +215,11 @@ export async function firescol<Data>(
 export type FiresbatchArgs<Data> = (
   | [docpath: string, operation: "create", data: Data]
   | [
-      docpath: string,
-      operation: "update",
-      data: PartialDeep<Data>,
-      pure?: boolean
-    ]
+    docpath: string,
+    operation: "update",
+    data: PartialDeep<Data>,
+    pure?: boolean
+  ]
   | [docpath: string, operation: "delete"]
 )[];
 /** Batch firestore function */

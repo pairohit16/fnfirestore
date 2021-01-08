@@ -39,9 +39,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.firesTransaction = exports.firesbatch = exports.firesdocdel = exports.firesdocrt = exports.firesdocup = exports.rbcol = exports.rbdocup = exports.rbdoc = exports.isfiresdoc = exports.firesdoc = exports.firesColRef = exports.firesDocRef = exports.firesArrayUnion = exports.firesIncrementBy = void 0;
+exports.firesTransaction = exports.firesbatch = exports.firesdocdel = exports.firesdocrt = exports.firesdocup = exports.rbcol = exports.rbdocdel = exports.rbdocup = exports.rbdoc = exports.isfiresdoc = exports.firesdoc = exports.firesColRef = exports.firesDocRef = exports.firesArrayUnion = exports.firesIncrementBy = void 0;
 var firebase_1 = __importDefault(require("firebase"));
 var firestore = firebase_1.default.firestore();
+var realtime = firebase_1.default.database();
 /** Relative increment */
 function firesIncrementBy(number) {
     return firebase_1.default.firestore.FieldValue.increment(number);
@@ -123,7 +124,7 @@ function rbdoc(docpath) {
             switch (_a.label) {
                 case 0:
                     _a.trys.push([0, 2, , 3]);
-                    return [4 /*yield*/, firebase_1.default.database().ref(docpath).once("value")];
+                    return [4 /*yield*/, realtime.ref(docpath).once("value")];
                 case 1:
                     ref = _a.sent();
                     if (!ref.exists())
@@ -150,7 +151,7 @@ function rbdocup(docpath, update) {
             switch (_a.label) {
                 case 0:
                     _a.trys.push([0, 2, , 3]);
-                    return [4 /*yield*/, firebase_1.default.database().ref(docpath).set(update)];
+                    return [4 /*yield*/, realtime.ref(docpath).set(update)];
                 case 1:
                     _a.sent();
                     return [2 /*return*/, Promise.resolve()];
@@ -163,6 +164,27 @@ function rbdocup(docpath, update) {
     });
 }
 exports.rbdocup = rbdocup;
+/** Delete the document (realtime database) */
+function rbdocdel(docpath) {
+    return __awaiter(this, void 0, void 0, function () {
+        var err_4;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    _a.trys.push([0, 2, , 3]);
+                    return [4 /*yield*/, realtime.ref(docpath).remove()];
+                case 1:
+                    _a.sent();
+                    return [2 /*return*/, Promise.resolve()];
+                case 2:
+                    err_4 = _a.sent();
+                    return [2 /*return*/, Promise.reject()];
+                case 3: return [2 /*return*/];
+            }
+        });
+    });
+}
+exports.rbdocdel = rbdocdel;
 /** Get the collection (realtime database) */
 function rbcol(colpath) {
     return __awaiter(this, void 0, void 0, function () {
@@ -171,7 +193,7 @@ function rbcol(colpath) {
             switch (_a.label) {
                 case 0:
                     _a.trys.push([0, 2, , 3]);
-                    return [4 /*yield*/, firebase_1.default.database().ref(colpath).once("value")];
+                    return [4 /*yield*/, realtime.ref(colpath).once("value")];
                 case 1:
                     refs = _a.sent();
                     return [2 /*return*/, Object.values(refs.val())];
@@ -190,7 +212,7 @@ function firesdocup(docpath, update,
 /** if enabled, on document don't exist it will throw an error */
 pure) {
     return __awaiter(this, void 0, void 0, function () {
-        var err_4;
+        var err_5;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
@@ -206,7 +228,7 @@ pure) {
                     _a.label = 4;
                 case 4: return [2 /*return*/, Promise.resolve()];
                 case 5:
-                    err_4 = _a.sent();
+                    err_5 = _a.sent();
                     return [2 /*return*/, Promise.reject()];
                 case 6: return [2 /*return*/];
             }
@@ -217,7 +239,7 @@ exports.firesdocup = firesdocup;
 /** Create the document */
 function firesdocrt(docpath, create) {
     return __awaiter(this, void 0, void 0, function () {
-        var snap, err_5;
+        var snap, err_6;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
@@ -232,7 +254,7 @@ function firesdocrt(docpath, create) {
                     _a.sent();
                     return [2 /*return*/, Promise.resolve(create)];
                 case 3:
-                    err_5 = _a.sent();
+                    err_6 = _a.sent();
                     return [2 /*return*/, Promise.reject()];
                 case 4: return [2 /*return*/];
             }
@@ -243,7 +265,7 @@ exports.firesdocrt = firesdocrt;
 /** Delete the document */
 function firesdocdel(docpath) {
     return __awaiter(this, void 0, void 0, function () {
-        var err_6;
+        var err_7;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
@@ -253,7 +275,7 @@ function firesdocdel(docpath) {
                     _a.sent();
                     return [2 /*return*/, Promise.resolve()];
                 case 2:
-                    err_6 = _a.sent();
+                    err_7 = _a.sent();
                     return [2 /*return*/, Promise.reject()];
                 case 3: return [2 /*return*/];
             }
@@ -264,7 +286,7 @@ exports.firesdocdel = firesdocdel;
 /** Batch firestore function */
 function firesbatch(args) {
     return __awaiter(this, void 0, void 0, function () {
-        var batch_1, err_7;
+        var batch_1, err_8;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
@@ -290,7 +312,7 @@ function firesbatch(args) {
                     _a.sent();
                     return [2 /*return*/, Promise.resolve()];
                 case 2:
-                    err_7 = _a.sent();
+                    err_8 = _a.sent();
                     return [2 /*return*/, Promise.reject()];
                 case 3: return [2 /*return*/];
             }

@@ -11,11 +11,13 @@ export declare function firesColRef<Data>(colpath: string): firebase.firestore.C
 /** Fetch the document */
 export declare function firesdoc<Data>(docpath: string): Promise<Data>;
 /** check weather document exists */
-export declare function isfiresdoc<Data>(docpath: string): Promise<boolean>;
+export declare function isfiresdoc(docpath: string): Promise<boolean>;
 /** Fetch the document (realtime database) */
 export declare function rbdoc<Data>(docpath: string): Promise<Data>;
 /** Update the document (realtime database) */
 export declare function rbdocup<Data>(docpath: string, update: Data): Promise<void>;
+/** Delete the document (realtime database) */
+export declare function rbdocdel(docpath: string): Promise<void>;
 /** Get the collection (realtime database) */
 export declare function rbcol<Data>(colpath: string): Promise<Data[]>;
 /** Update the document */

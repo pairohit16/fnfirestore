@@ -1,6 +1,7 @@
 import firebase from "firebase";
 import { PartialDeep } from "../custom-types";
 const firestore = firebase.firestore();
+const realtime = firebase.database();
 
 /** Relative increment */
 export function firesIncrementBy(number: number): number {
@@ -43,7 +44,7 @@ export async function firesdoc<Data>(docpath: string) {
 }
 
 /** check weather document exists */
-export async function isfiresdoc<Data>(docpath: string) {
+export async function isfiresdoc(docpath: string) {
   try {
     const snap = await firestore.doc(docpath).get();
     return snap.exists;
@@ -55,7 +56,7 @@ export async function isfiresdoc<Data>(docpath: string) {
 /** Fetch the document (realtime database) */
 export async function rbdoc<Data>(docpath: string) {
   try {
-    const ref = await firebase.database().ref(docpath).once("value");
+    const ref = await realtime.ref(docpath).once("value");
     if (!ref.exists())
       return Promise.reject({
         code: 404,
@@ -72,7 +73,18 @@ export async function rbdoc<Data>(docpath: string) {
 /** Update the document (realtime database) */
 export async function rbdocup<Data>(docpath: string, update: Data) {
   try {
-    await firebase.database().ref(docpath).set(update);
+    await realtime.ref(docpath).set(update);
+
+    return Promise.resolve();
+  } catch (err) {
+    return Promise.reject();
+  }
+}
+
+/** Delete the document (realtime database) */
+export async function rbdocdel(docpath: string) {
+  try {
+    await realtime.ref(docpath).remove();
 
     return Promise.resolve();
   } catch (err) {
@@ -83,7 +95,7 @@ export async function rbdocup<Data>(docpath: string, update: Data) {
 /** Get the collection (realtime database) */
 export async function rbcol<Data>(colpath: string) {
   try {
-    const refs = await firebase.database().ref(colpath).once("value");
+    const refs = await realtime.ref(colpath).once("value");
     return Object.values(refs.val()) as Data[];
   } catch (error) {
     return Promise.reject();
@@ -135,11 +147,11 @@ export async function firesdocdel(docpath: string) {
 export async function firesbatch<Data>(
   args: (
     | [
-        docpath: string,
-        operation: "update",
-        data: PartialDeep<Data>,
-        pure?: boolean
-      ]
+      docpath: string,
+      operation: "update",
+      data: PartialDeep<Data>,
+      pure?: boolean
+    ]
     | [docpath: string, operation: "delete"]
   )[]
 ) {
