@@ -146,19 +146,22 @@ exports.rbdoc = rbdoc;
 /** Update the document (realtime database) */
 function rbdocup(docpath, update) {
     return __awaiter(this, void 0, void 0, function () {
-        var err_3;
+        var result, err_3;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
-                    _a.trys.push([0, 2, , 3]);
+                    _a.trys.push([0, 3, , 4]);
                     return [4 /*yield*/, realtime.ref(docpath).set(update)];
                 case 1:
                     _a.sent();
-                    return [2 /*return*/, Promise.resolve()];
+                    return [4 /*yield*/, rbdoc(docpath)];
                 case 2:
+                    result = _a.sent();
+                    return [2 /*return*/, Promise.resolve(result)];
+                case 3:
                     err_3 = _a.sent();
                     return [2 /*return*/, Promise.reject()];
-                case 3: return [2 /*return*/];
+                case 4: return [2 /*return*/];
             }
         });
     });
@@ -212,11 +215,11 @@ function firesdocup(docpath, update,
 /** if enabled, on document don't exist it will throw an error */
 pure) {
     return __awaiter(this, void 0, void 0, function () {
-        var err_5;
+        var result, err_5;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
-                    _a.trys.push([0, 5, , 6]);
+                    _a.trys.push([0, 6, , 7]);
                     if (!pure) return [3 /*break*/, 2];
                     return [4 /*yield*/, firestore.doc(docpath).update(update)];
                 case 1:
@@ -226,11 +229,14 @@ pure) {
                 case 3:
                     _a.sent();
                     _a.label = 4;
-                case 4: return [2 /*return*/, Promise.resolve()];
+                case 4: return [4 /*yield*/, firesdoc(docpath)];
                 case 5:
+                    result = _a.sent();
+                    return [2 /*return*/, Promise.resolve(result)];
+                case 6:
                     err_5 = _a.sent();
                     return [2 /*return*/, Promise.reject()];
-                case 6: return [2 /*return*/];
+                case 7: return [2 /*return*/];
             }
         });
     });

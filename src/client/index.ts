@@ -75,7 +75,8 @@ export async function rbdocup<Data>(docpath: string, update: Data) {
   try {
     await realtime.ref(docpath).set(update);
 
-    return Promise.resolve();
+    const result = await rbdoc<Data>(docpath);
+    return Promise.resolve(result);
   } catch (err) {
     return Promise.reject();
   }
@@ -116,7 +117,9 @@ export async function firesdocup<Data>(
     } else {
       await firestore.doc(docpath).set(update, { merge: true });
     }
-    return Promise.resolve();
+
+    const result = await firesdoc<Data>(docpath);
+    return Promise.resolve(result);
   } catch (err) {
     return Promise.reject();
   }

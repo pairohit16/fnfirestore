@@ -15,7 +15,7 @@ export declare function isfiresdoc(docpath: string): Promise<boolean>;
 /** Fetch the document (realtime database) */
 export declare function rbdoc<Data>(docpath: string): Promise<Data>;
 /** Update the document (realtime database) */
-export declare function rbdocup<Data>(docpath: string, update: Data): Promise<void>;
+export declare function rbdocup<Data>(docpath: string, update: Data): Promise<Data>;
 /** Delete the document (realtime database) */
 export declare function rbdocdel(docpath: string): Promise<void>;
 /** Get the collection (realtime database) */
@@ -23,7 +23,7 @@ export declare function rbcol<Data>(colpath: string): Promise<Data[]>;
 /** Update the document */
 export declare function firesdocup<Data>(docpath: string, update: PartialDeep<Data>, 
 /** if enabled, on document don't exist it will throw an error */
-pure?: boolean): Promise<void>;
+pure?: boolean): Promise<Data>;
 /** Create the document */
 export declare function firesdocrt<Data>(docpath: string, create: Data): Promise<Data>;
 /** Delete the document */
