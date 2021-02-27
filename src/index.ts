@@ -110,11 +110,21 @@ export async function firesdocup<Data>(
   pure?: boolean
 ) {
   try {
+    // if any value is undefined means it has to delete
+    // as if undefined is pass the firebase throws an error
+    Object.keys(update).forEach((key) => {
+      const value = update[key];
+      if (value === undefined) {
+        update[key] = admin.firestore.FieldValue.delete();
+      }
+    });
+
     if (pure) {
       await firestore.doc(docpath).update(update);
     } else {
       await firestore.doc(docpath).set(update, { merge: true });
     }
+
     return Promise.resolve();
   } catch (err) {
     return Promise.reject();
@@ -145,29 +155,29 @@ export type FirescolWhere<Data> =
   | [keyof Data, "<" | "<=" | "==" | ">=" | ">" | "!=", any]
   | [keyof Data, "<" | "<=" | "==" | ">=" | ">" | "!=", any]
   | [
-    keyof Data,
-    "array-contains" | "in" | "not-in" | "array-contains-any",
-    any[]
-  ]
+      keyof Data,
+      "array-contains" | "in" | "not-in" | "array-contains-any",
+      any[]
+    ]
   | [
-    keyof Data,
-    "array-contains" | "in" | "not-in" | "array-contains-any",
-    any[]
-  ]
+      keyof Data,
+      "array-contains" | "in" | "not-in" | "array-contains-any",
+      any[]
+    ]
   | (
-    | [keyof Data, "<" | "<=" | "==" | ">=" | ">" | "!=", any]
-    | [keyof Data, "<" | "<=" | "==" | ">=" | ">" | "!=", any]
-    | [
-      keyof Data,
-      "array-contains" | "in" | "not-in" | "array-contains-any",
-      any[]
-    ]
-    | [
-      keyof Data,
-      "array-contains" | "in" | "not-in" | "array-contains-any",
-      any[]
-    ]
-  )[];
+      | [keyof Data, "<" | "<=" | "==" | ">=" | ">" | "!=", any]
+      | [keyof Data, "<" | "<=" | "==" | ">=" | ">" | "!=", any]
+      | [
+          keyof Data,
+          "array-contains" | "in" | "not-in" | "array-contains-any",
+          any[]
+        ]
+      | [
+          keyof Data,
+          "array-contains" | "in" | "not-in" | "array-contains-any",
+          any[]
+        ]
+    )[];
 /**
  * Query firestore collection
  * @param colpath firestore collection path
@@ -215,11 +225,11 @@ export async function firescol<Data>(
 export type FiresbatchArgs<Data> = (
   | [docpath: string, operation: "create", data: Data]
   | [
-    docpath: string,
-    operation: "update",
-    data: PartialDeep<Data>,
-    pure?: boolean
-  ]
+      docpath: string,
+      operation: "update",
+      data: PartialDeep<Data>,
+      pure?: boolean
+    ]
   | [docpath: string, operation: "delete"]
 )[];
 /** Batch firestore function */

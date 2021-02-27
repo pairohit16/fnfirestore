@@ -219,24 +219,34 @@ pure) {
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
-                    _a.trys.push([0, 6, , 7]);
-                    if (!pure) return [3 /*break*/, 2];
-                    return [4 /*yield*/, firestore.doc(docpath).update(update)];
+                    // if any value is undefined means it has to delete
+                    // as if undefined is pass the firebase throws an error
+                    Object.keys(update).forEach(function (key) {
+                        var value = update[key];
+                        if (value === undefined) {
+                            update[key] = firebase_1.default.firestore.FieldValue.delete();
+                        }
+                    });
+                    _a.label = 1;
                 case 1:
+                    _a.trys.push([1, 7, , 8]);
+                    if (!pure) return [3 /*break*/, 3];
+                    return [4 /*yield*/, firestore.doc(docpath).update(update)];
+                case 2:
                     _a.sent();
-                    return [3 /*break*/, 4];
-                case 2: return [4 /*yield*/, firestore.doc(docpath).set(update, { merge: true })];
-                case 3:
+                    return [3 /*break*/, 5];
+                case 3: return [4 /*yield*/, firestore.doc(docpath).set(update, { merge: true })];
+                case 4:
                     _a.sent();
-                    _a.label = 4;
-                case 4: return [4 /*yield*/, firesdoc(docpath)];
-                case 5:
+                    _a.label = 5;
+                case 5: return [4 /*yield*/, firesdoc(docpath)];
+                case 6:
                     result = _a.sent();
                     return [2 /*return*/, Promise.resolve(result)];
-                case 6:
+                case 7:
                     err_5 = _a.sent();
                     return [2 /*return*/, Promise.reject()];
-                case 7: return [2 /*return*/];
+                case 8: return [2 /*return*/];
             }
         });
     });

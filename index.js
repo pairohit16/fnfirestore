@@ -232,6 +232,14 @@ pure) {
             switch (_a.label) {
                 case 0:
                     _a.trys.push([0, 5, , 6]);
+                    // if any value is undefined means it has to delete
+                    // as if undefined is pass the firebase throws an error
+                    Object.keys(update).forEach(function (key) {
+                        var value = update[key];
+                        if (value === undefined) {
+                            update[key] = admin.firestore.FieldValue.delete();
+                        }
+                    });
                     if (!pure) return [3 /*break*/, 2];
                     return [4 /*yield*/, firestore.doc(docpath).update(update)];
                 case 1:

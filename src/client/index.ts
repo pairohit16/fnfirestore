@@ -111,6 +111,15 @@ export async function firesdocup<Data>(
   /** if enabled, on document don't exist it will throw an error */
   pure?: boolean
 ) {
+  // if any value is undefined means it has to delete
+  // as if undefined is pass the firebase throws an error
+  Object.keys(update).forEach((key) => {
+    const value = update[key];
+    if (value === undefined) {
+      update[key] = firebase.firestore.FieldValue.delete();
+    }
+  });
+
   try {
     if (pure) {
       await firestore.doc(docpath).update(update);
@@ -150,11 +159,11 @@ export async function firesdocdel(docpath: string) {
 export async function firesbatch<Data>(
   args: (
     | [
-      docpath: string,
-      operation: "update",
-      data: PartialDeep<Data>,
-      pure?: boolean
-    ]
+        docpath: string,
+        operation: "update",
+        data: PartialDeep<Data>,
+        pure?: boolean
+      ]
     | [docpath: string, operation: "delete"]
   )[]
 ) {
