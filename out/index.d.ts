@@ -70,5 +70,5 @@ export interface Transaction {
     delete(docpath: string): void;
 }
 /** Transaction */
-export declare function firesTransaction(func: (transaction: Transaction) => unknown): Promise<unknown>;
+export declare function firesTransaction(func: (transaction: Transaction) => unknown, maxAttempts?: number): Promise<unknown>;
 //# sourceMappingURL=index.d.ts.map

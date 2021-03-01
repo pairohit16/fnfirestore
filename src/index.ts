@@ -134,6 +134,15 @@ export async function firesdocup<Data>(
 /** Create the document */
 export async function firesdocrt<Data>(docpath: string, create: Data) {
   try {
+    // if any value is undefined means it has to not uploaded
+    // as if undefined is pass the firebase throws an error
+    Object.keys(create).forEach((key) => {
+      const value = create[key];
+      if (value === undefined) {
+        delete create[key];
+      }
+    });
+
     await firestore.doc(docpath).create(create);
     return Promise.resolve(create);
   } catch (err) {
@@ -270,7 +279,8 @@ export interface Transaction {
 
 /** Transaction */
 export async function firesTransaction(
-  func: (transaction: Transaction) => unknown
+  func: (transaction: Transaction) => unknown,
+  maxAttempts = 3
 ) {
   return firestore.runTransaction(
     async (transaction) => {
@@ -302,6 +312,6 @@ export async function firesTransaction(
 
       return func(trans);
     },
-    { maxAttempts: 3 }
+    { maxAttempts }
   );
 }

@@ -1,9 +1,9 @@
 {
   "name": "@pairohit/fnfirestore",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "cleaner function for firestore & realtime",
-  "main": ".",
-  "types": ".",
+  "main": "./out/index.js",
+  "types": "./out/index.d.ts",
   "author": "PaiRohit",
   "license": "MIT",
   "homepage": "https://github.com/pairohit16/fnfirestore",
@@ -22,8 +22,7 @@
   ],
   "scripts": {
     "build": "tsc -p .",
-    "test": "ts-node playground/index.ts",
-    "publish:npm": "npm publish"
+    "test": "ts-node playground/index.ts"
   },
   "peerDependencies": {
     "firebase": "*",

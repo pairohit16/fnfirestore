@@ -267,6 +267,14 @@ function firesdocrt(docpath, create) {
             switch (_a.label) {
                 case 0:
                     _a.trys.push([0, 2, , 3]);
+                    // if any value is undefined means it has to not uploaded
+                    // as if undefined is pass the firebase throws an error
+                    Object.keys(create).forEach(function (key) {
+                        var value = create[key];
+                        if (value === undefined) {
+                            delete create[key];
+                        }
+                    });
                     return [4 /*yield*/, firestore.doc(docpath).create(create)];
                 case 1:
                     _a.sent();
@@ -392,7 +400,8 @@ function firesbatch(args) {
 }
 exports.firesbatch = firesbatch;
 /** Transaction */
-function firesTransaction(func) {
+function firesTransaction(func, maxAttempts) {
+    if (maxAttempts === void 0) { maxAttempts = 3; }
     return __awaiter(this, void 0, void 0, function () {
         var _this = this;
         return __generator(this, function (_a) {
@@ -432,7 +441,7 @@ function firesTransaction(func) {
                         };
                         return [2 /*return*/, func(trans)];
                     });
-                }); }, { maxAttempts: 3 })];
+                }); }, { maxAttempts: maxAttempts })];
         });
     });
 }
