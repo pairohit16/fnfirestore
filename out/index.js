@@ -55,7 +55,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.firesTransaction = exports.firesbatch = exports.firescol = exports.firesdocdel = exports.firesdocrt = exports.firesdocup = exports.rbcol = exports.rbdocdel = exports.rbdocup = exports.rbdoc = exports.isfiresdoc = exports.firesdoc = exports.firesColRef = exports.firesDocRef = exports.firesArrayUnion = exports.firesIncrementBy = void 0;
+exports.firesTransaction = exports.firesdocall = exports.firesbatch = exports.firescol = exports.firesdocdel = exports.firesdocrt = exports.firesdocup = exports.rbcol = exports.rbdocdel = exports.rbdocup = exports.rbdoc = exports.isfiresdoc = exports.firesdoc = exports.firesColRef = exports.firesDocRef = exports.firesArrayUnion = exports.firesIncrementBy = void 0;
 var admin = __importStar(require("firebase-admin"));
 var firestore = admin.firestore();
 var realtime = admin.database();
@@ -232,14 +232,6 @@ pure) {
             switch (_a.label) {
                 case 0:
                     _a.trys.push([0, 5, , 6]);
-                    // if any value is undefined means it has to delete
-                    // as if undefined is pass the firebase throws an error
-                    Object.keys(update).forEach(function (key) {
-                        var value = update[key];
-                        if (value === undefined) {
-                            update[key] = admin.firestore.FieldValue.delete();
-                        }
-                    });
                     if (!pure) return [3 /*break*/, 2];
                     return [4 /*yield*/, firestore.doc(docpath).update(update)];
                 case 1:
@@ -267,14 +259,6 @@ function firesdocrt(docpath, create) {
             switch (_a.label) {
                 case 0:
                     _a.trys.push([0, 2, , 3]);
-                    // if any value is undefined means it has to not uploaded
-                    // as if undefined is pass the firebase throws an error
-                    Object.keys(create).forEach(function (key) {
-                        var value = create[key];
-                        if (value === undefined) {
-                            delete create[key];
-                        }
-                    });
                     return [4 /*yield*/, firestore.doc(docpath).create(create)];
                 case 1:
                     _a.sent();
@@ -359,46 +343,143 @@ function firescol(colpath, query) {
     });
 }
 exports.firescol = firescol;
-/** Batch firestore function */
 function firesbatch(args) {
     return __awaiter(this, void 0, void 0, function () {
-        var batch_1, err_9;
+        var op_1, perBatch_1, FIRBASE_MAX_BATCH_DOC_COUNT, args500_1, into, loops, i, err_9;
+        var _this = this;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    _a.trys.push([0, 4, , 5]);
+                    op_1 = {
+                        success: 0,
+                        fail: 0,
+                    };
+                    perBatch_1 = function (arg, onOperationDone) { return __awaiter(_this, void 0, void 0, function () {
+                        var batch, _a;
+                        return __generator(this, function (_b) {
+                            switch (_b.label) {
+                                case 0:
+                                    batch = firestore.batch();
+                                    arg.forEach(function (arg) {
+                                        switch (arg[1]) {
+                                            case "create":
+                                                batch.create(firestore.doc(arg[0]), arg[2]);
+                                                break;
+                                            case "update":
+                                                if (arg[3]) {
+                                                    batch.update(firestore.doc(arg[0]), arg[2]);
+                                                }
+                                                else {
+                                                    batch.set(firestore.doc(arg[0]), arg[2], { merge: true });
+                                                }
+                                                break;
+                                            case "delete":
+                                                batch.delete(firestore.doc(arg[0]));
+                                                break;
+                                        }
+                                    });
+                                    _b.label = 1;
+                                case 1:
+                                    _b.trys.push([1, 3, , 4]);
+                                    return [4 /*yield*/, batch.commit()];
+                                case 2:
+                                    _b.sent();
+                                    onOperationDone && onOperationDone(true);
+                                    return [3 /*break*/, 4];
+                                case 3:
+                                    _a = _b.sent();
+                                    onOperationDone && onOperationDone(false);
+                                    return [3 /*break*/, 4];
+                                case 4: return [2 /*return*/];
+                            }
+                        });
+                    }); };
+                    FIRBASE_MAX_BATCH_DOC_COUNT = 500;
+                    if (!(args.length <= FIRBASE_MAX_BATCH_DOC_COUNT)) return [3 /*break*/, 1];
+                    // max doc per batch is 500
+                    return [2 /*return*/, new Promise(function (resolve) { return __awaiter(_this, void 0, void 0, function () {
+                            return __generator(this, function (_a) {
+                                switch (_a.label) {
+                                    case 0: return [4 /*yield*/, perBatch_1(args, function (result) {
+                                            result ? (op_1.success += args.length) : (op_1.fail += args.length);
+                                            resolve(op_1);
+                                        })];
+                                    case 1:
+                                        _a.sent();
+                                        return [2 /*return*/];
+                                }
+                            });
+                        }); })];
+                case 1:
+                    args500_1 = [];
+                    into = FIRBASE_MAX_BATCH_DOC_COUNT;
+                    loops = Math.ceil(args.length / into);
+                    for (i = 0; i < loops; i++) {
+                        args500_1.push(args.slice(i * into, i * into + into));
+                    }
+                    return [4 /*yield*/, new Promise(function (resolve) {
+                            var promises = args500_1.length;
+                            args500_1.forEach(function (arg) { return __awaiter(_this, void 0, void 0, function () {
+                                var docs;
+                                return __generator(this, function (_a) {
+                                    switch (_a.label) {
+                                        case 0:
+                                            docs = arg.length;
+                                            return [4 /*yield*/, perBatch_1(arg, function (result) {
+                                                    result ? (op_1.success += docs) : (op_1.fail += docs);
+                                                    // all promises has been resolved
+                                                    promises--;
+                                                    if (promises === 0) {
+                                                        resolve(op_1);
+                                                    }
+                                                })];
+                                        case 1:
+                                            _a.sent();
+                                            return [2 /*return*/];
+                                    }
+                                });
+                            }); });
+                        })];
+                case 2: return [2 /*return*/, _a.sent()];
+                case 3: return [3 /*break*/, 5];
+                case 4:
+                    err_9 = _a.sent();
+                    return [2 /*return*/, Promise.reject()];
+                case 5: return [2 /*return*/];
+            }
+        });
+    });
+}
+exports.firesbatch = firesbatch;
+/** Fetch all docs at once */
+function firesdocall(docpaths) {
+    return __awaiter(this, void 0, void 0, function () {
+        var docs, err_10;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
                     _a.trys.push([0, 2, , 3]);
-                    batch_1 = firestore.batch();
-                    args.forEach(function (arg) {
-                        switch (arg[1]) {
-                            case "create":
-                                batch_1.create(firestore.doc(arg[0]), arg[2]);
-                                break;
-                            case "update":
-                                if (arg[3]) {
-                                    batch_1.update(firestore.doc(arg[0]), arg[2]);
-                                }
-                                else {
-                                    batch_1.set(firestore.doc(arg[0]), arg[2], { merge: true });
-                                }
-                                break;
-                            case "delete":
-                                batch_1.delete(firestore.doc(arg[0]));
-                                break;
-                        }
-                    });
-                    return [4 /*yield*/, batch_1.commit()];
+                    return [4 /*yield*/, firestore.getAll.apply(firestore, docpaths.map(firesDocRef))];
                 case 1:
-                    _a.sent();
-                    return [2 /*return*/, Promise.resolve()];
+                    docs = _a.sent();
+                    if (docs.length <= 0) {
+                        return [2 /*return*/, Promise.reject({
+                                code: 404,
+                                message: "Not Found!",
+                                nonexistent: true,
+                            })];
+                    }
+                    return [2 /*return*/, docs.map(function (d) { return d.data(); })];
                 case 2:
-                    err_9 = _a.sent();
+                    err_10 = _a.sent();
                     return [2 /*return*/, Promise.reject()];
                 case 3: return [2 /*return*/];
             }
         });
     });
 }
-exports.firesbatch = firesbatch;
+exports.firesdocall = firesdocall;
 /** Transaction */
 function firesTransaction(func, maxAttempts) {
     if (maxAttempts === void 0) { maxAttempts = 3; }

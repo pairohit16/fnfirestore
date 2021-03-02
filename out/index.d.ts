@@ -62,7 +62,13 @@ export declare type FiresbatchArgs<Data> = ([docpath: string, operation: "create
     pure?: boolean
 ] | [docpath: string, operation: "delete"])[];
 /** Batch firestore function */
-export declare function firesbatch<Data>(args: FiresbatchArgs<Data>): Promise<void>;
+declare type BatchOP = {
+    success: number;
+    fail: number;
+};
+export declare function firesbatch<Data>(args: FiresbatchArgs<Data>): Promise<BatchOP>;
+/** Fetch all docs at once */
+export declare function firesdocall<Data>(docpaths: string[]): Promise<Data[]>;
 export interface Transaction {
     get<Data>(docpath: string): Promise<Data>;
     update<Data>(docpath: string, data: PartialDeep<Data>, pure?: boolean): void;
@@ -71,4 +77,5 @@ export interface Transaction {
 }
 /** Transaction */
 export declare function firesTransaction(func: (transaction: Transaction) => unknown, maxAttempts?: number): Promise<unknown>;
+export {};
 //# sourceMappingURL=index.d.ts.map

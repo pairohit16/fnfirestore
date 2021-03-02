@@ -110,15 +110,6 @@ export async function firesdocup<Data>(
   pure?: boolean
 ) {
   try {
-    // if any value is undefined means it has to delete
-    // as if undefined is pass the firebase throws an error
-    Object.keys(update).forEach((key) => {
-      const value = update[key];
-      if (value === undefined) {
-        update[key] = admin.firestore.FieldValue.delete();
-      }
-    });
-
     if (pure) {
       await firestore.doc(docpath).update(update);
     } else {
@@ -134,15 +125,6 @@ export async function firesdocup<Data>(
 /** Create the document */
 export async function firesdocrt<Data>(docpath: string, create: Data) {
   try {
-    // if any value is undefined means it has to not uploaded
-    // as if undefined is pass the firebase throws an error
-    Object.keys(create).forEach((key) => {
-      const value = create[key];
-      if (value === undefined) {
-        delete create[key];
-      }
-    });
-
     await firestore.doc(docpath).create(create);
     return Promise.resolve(create);
   } catch (err) {
@@ -242,29 +224,103 @@ export type FiresbatchArgs<Data> = (
   | [docpath: string, operation: "delete"]
 )[];
 /** Batch firestore function */
-export async function firesbatch<Data>(args: FiresbatchArgs<Data>) {
+type BatchOP = {
+  success: number;
+  fail: number;
+};
+export async function firesbatch<Data>(
+  args: FiresbatchArgs<Data>
+): Promise<BatchOP> {
   try {
-    const batch = firestore.batch();
-    args.forEach((arg) => {
-      switch (arg[1]) {
-        case "create":
-          batch.create(firestore.doc(arg[0]), arg[2]);
-          break;
-        case "update":
-          if (arg[3]) {
-            batch.update(firestore.doc(arg[0]), arg[2]);
-          } else {
-            batch.set(firestore.doc(arg[0]), arg[2], { merge: true });
-          }
-          break;
-        case "delete":
-          batch.delete(firestore.doc(arg[0]));
-          break;
-      }
-    });
+    const op: BatchOP = {
+      success: 0,
+      fail: 0,
+    };
+    const perBatch = async (
+      arg: FiresbatchArgs<Data>,
+      onOperationDone?: (result: boolean) => any
+    ) => {
+      const batch = firestore.batch();
 
-    await batch.commit();
-    return Promise.resolve();
+      arg.forEach((arg) => {
+        switch (arg[1]) {
+          case "create":
+            batch.create(firestore.doc(arg[0]), arg[2]);
+            break;
+          case "update":
+            if (arg[3]) {
+              batch.update(firestore.doc(arg[0]), arg[2]);
+            } else {
+              batch.set(firestore.doc(arg[0]), arg[2], { merge: true });
+            }
+            break;
+          case "delete":
+            batch.delete(firestore.doc(arg[0]));
+            break;
+        }
+      });
+      try {
+        await batch.commit();
+        onOperationDone && onOperationDone(true);
+      } catch {
+        onOperationDone && onOperationDone(false);
+      }
+    };
+    const FIRBASE_MAX_BATCH_DOC_COUNT = 500;
+
+    if (args.length <= FIRBASE_MAX_BATCH_DOC_COUNT) {
+      // max doc per batch is 500
+      return new Promise(async (resolve) => {
+        await perBatch(args, (result) => {
+          result ? (op.success += args.length) : (op.fail += args.length);
+          resolve(op);
+        });
+      });
+    } else {
+      // if docs are more than 500 then split them into arrays of 500 each and batch them
+      const args500: FiresbatchArgs<Data>[] = [];
+      const into = FIRBASE_MAX_BATCH_DOC_COUNT;
+
+      let loops = Math.ceil(args.length / into);
+      for (let i = 0; i < loops; i++) {
+        args500.push(args.slice(i * into, i * into + into));
+      }
+
+      return await new Promise((resolve) => {
+        let promises = args500.length;
+
+        args500.forEach(async (arg) => {
+          const docs = arg.length;
+
+          await perBatch(arg, (result) => {
+            result ? (op.success += docs) : (op.fail += docs);
+
+            // all promises has been resolved
+            promises--;
+            if (promises === 0) {
+              resolve(op);
+            }
+          });
+        });
+      });
+    }
+  } catch (err) {
+    return Promise.reject();
+  }
+}
+/** Fetch all docs at once */
+export async function firesdocall<Data>(docpaths: string[]) {
+  try {
+    const docs = await firestore.getAll(...(docpaths.map(firesDocRef) as any));
+    if (docs.length <= 0) {
+      return Promise.reject({
+        code: 404,
+        message: "Not Found!",
+        nonexistent: true,
+      });
+    }
+
+    return docs.map((d) => d.data()) as Data[];
   } catch (err) {
     return Promise.reject();
   }
@@ -276,7 +332,6 @@ export interface Transaction {
   create<Data>(docpath: string, data: Data): void;
   delete(docpath: string): void;
 }
-
 /** Transaction */
 export async function firesTransaction(
   func: (transaction: Transaction) => unknown,
