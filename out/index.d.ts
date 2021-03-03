@@ -27,22 +27,22 @@ pure?: boolean): Promise<void>;
 export declare function firesdocrt<Data>(docpath: string, create: Data): Promise<Data>;
 /** Delete the document */
 export declare function firesdocdel(docpath: string): Promise<void>;
-export declare type FirescolWhere<Data> = [keyof Data, "<" | "<=" | "==" | ">=" | ">" | "!=", any] | [keyof Data, "<" | "<=" | "==" | ">=" | ">" | "!=", any] | [
+export declare type FirescolWhere<Data> = [
     keyof Data,
-    "array-contains" | "in" | "not-in" | "array-contains-any",
-    any[]
+    "<" | "<=" | "==" | ">=" | ">" | "!=",
+    string | boolean | number
 ] | [
     keyof Data,
     "array-contains" | "in" | "not-in" | "array-contains-any",
-    any[]
-] | ([keyof Data, "<" | "<=" | "==" | ">=" | ">" | "!=", any] | [keyof Data, "<" | "<=" | "==" | ">=" | ">" | "!=", any] | [
+    (string | boolean | number)[]
+] | ([
+    keyof Data,
+    "<" | "<=" | "==" | ">=" | ">" | "!=",
+    string | boolean | number
+][] | [
     keyof Data,
     "array-contains" | "in" | "not-in" | "array-contains-any",
-    any[]
-] | [
-    keyof Data,
-    "array-contains" | "in" | "not-in" | "array-contains-any",
-    any[]
+    (string | boolean | number)[]
 ])[];
 /**
  * Query firestore collection

@@ -1,6 +1,6 @@
 {
   "name": "@pairohit/fnfirestore",
-  "version": "1.1.5",
+  "version": "1.1.52",
   "description": "cleaner function for firestore & realtime",
   "main": "./out/index.js",
   "types": "./out/index.d.ts",

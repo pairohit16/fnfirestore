@@ -143,30 +143,26 @@ export async function firesdocdel(docpath: string) {
 }
 
 export type FirescolWhere<Data> =
-  | [keyof Data, "<" | "<=" | "==" | ">=" | ">" | "!=", any]
-  | [keyof Data, "<" | "<=" | "==" | ">=" | ">" | "!=", any]
   | [
       keyof Data,
-      "array-contains" | "in" | "not-in" | "array-contains-any",
-      any[]
+      "<" | "<=" | "==" | ">=" | ">" | "!=",
+      string | boolean | number
     ]
   | [
       keyof Data,
       "array-contains" | "in" | "not-in" | "array-contains-any",
-      any[]
+      (string | boolean | number)[]
     ]
   | (
-      | [keyof Data, "<" | "<=" | "==" | ">=" | ">" | "!=", any]
-      | [keyof Data, "<" | "<=" | "==" | ">=" | ">" | "!=", any]
+      | [
+          keyof Data,
+          "<" | "<=" | "==" | ">=" | ">" | "!=",
+          string | boolean | number
+        ][]
       | [
           keyof Data,
           "array-contains" | "in" | "not-in" | "array-contains-any",
-          any[]
-        ]
-      | [
-          keyof Data,
-          "array-contains" | "in" | "not-in" | "array-contains-any",
-          any[]
+          (string | boolean | number)[]
         ]
     )[];
 /**
