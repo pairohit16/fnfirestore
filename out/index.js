@@ -85,7 +85,7 @@ function firesColRef(colpath) {
 }
 exports.firesColRef = firesColRef;
 /** Fetch the document */
-function firesdoc(docpath) {
+function firesdoc(docpath, debug) {
     return __awaiter(this, void 0, void 0, function () {
         var snap, err_1;
         return __generator(this, function (_a) {
@@ -101,9 +101,15 @@ function firesdoc(docpath) {
                                 message: "Not Found!",
                                 nonexistent: true,
                             })];
+                    if (debug) {
+                        console.log("firesdoc: " + snap.data());
+                    }
                     return [2 /*return*/, snap.data()];
                 case 2:
                     err_1 = _a.sent();
+                    if (debug) {
+                        console.log({ firesdoc: err_1 });
+                    }
                     return [2 /*return*/, Promise.reject()];
                 case 3: return [2 /*return*/];
             }
@@ -133,7 +139,7 @@ function isfiresdoc(docpath) {
 }
 exports.isfiresdoc = isfiresdoc;
 /** Fetch the document (realtime database) */
-function rbdoc(docpath) {
+function rbdoc(docpath, debug) {
     return __awaiter(this, void 0, void 0, function () {
         var ref, err_2;
         return __generator(this, function (_a) {
@@ -149,9 +155,15 @@ function rbdoc(docpath) {
                                 message: "Not Found!",
                                 nonexistent: true,
                             })];
+                    if (debug) {
+                        console.log("rbdoc: " + ref.val());
+                    }
                     return [2 /*return*/, ref.val()];
                 case 2:
                     err_2 = _a.sent();
+                    if (debug) {
+                        console.log({ rbdoc: err_2 });
+                    }
                     return [2 /*return*/, Promise.reject()];
                 case 3: return [2 /*return*/];
             }
@@ -160,7 +172,7 @@ function rbdoc(docpath) {
 }
 exports.rbdoc = rbdoc;
 /** Update the document (realtime database) */
-function rbdocup(docpath, update) {
+function rbdocup(docpath, update, debug) {
     return __awaiter(this, void 0, void 0, function () {
         var err_3;
         return __generator(this, function (_a) {
@@ -170,9 +182,15 @@ function rbdocup(docpath, update) {
                     return [4 /*yield*/, realtime.ref(docpath).set(update)];
                 case 1:
                     _a.sent();
+                    if (debug) {
+                        console.log("rbdocup: UPDATED");
+                    }
                     return [2 /*return*/, Promise.resolve()];
                 case 2:
                     err_3 = _a.sent();
+                    if (debug) {
+                        console.log({ rbdocup: err_3 });
+                    }
                     return [2 /*return*/, Promise.reject()];
                 case 3: return [2 /*return*/];
             }
@@ -181,7 +199,7 @@ function rbdocup(docpath, update) {
 }
 exports.rbdocup = rbdocup;
 /** Delete the document (realtime database) */
-function rbdocdel(docpath) {
+function rbdocdel(docpath, debug) {
     return __awaiter(this, void 0, void 0, function () {
         var err_4;
         return __generator(this, function (_a) {
@@ -191,9 +209,15 @@ function rbdocdel(docpath) {
                     return [4 /*yield*/, realtime.ref(docpath).remove()];
                 case 1:
                     _a.sent();
+                    if (debug) {
+                        console.log("rbdocdel: DELETED");
+                    }
                     return [2 /*return*/, Promise.resolve()];
                 case 2:
                     err_4 = _a.sent();
+                    if (debug) {
+                        console.log({ rbdocdel: err_4 });
+                    }
                     return [2 /*return*/, Promise.reject()];
                 case 3: return [2 /*return*/];
             }
@@ -202,9 +226,9 @@ function rbdocdel(docpath) {
 }
 exports.rbdocdel = rbdocdel;
 /** Get the collection (realtime database) */
-function rbcol(colpath) {
+function rbcol(colpath, debug) {
     return __awaiter(this, void 0, void 0, function () {
-        var refs, error_1;
+        var refs, err_5;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
@@ -212,9 +236,18 @@ function rbcol(colpath) {
                     return [4 /*yield*/, realtime.ref(colpath).once("value")];
                 case 1:
                     refs = _a.sent();
+                    if (debug) {
+                        console.log("rbcol: KEYS_COUNT: " +
+                            Object.values(refs.val()).length +
+                            ", DATA: " +
+                            Object.values(refs.val()));
+                    }
                     return [2 /*return*/, Object.values(refs.val())];
                 case 2:
-                    error_1 = _a.sent();
+                    err_5 = _a.sent();
+                    if (debug) {
+                        console.log({ rbcol: err_5 });
+                    }
                     return [2 /*return*/, Promise.reject()];
                 case 3: return [2 /*return*/];
             }
@@ -225,9 +258,9 @@ exports.rbcol = rbcol;
 /** Update the document */
 function firesdocup(docpath, update, 
 /** if enabled, on document don't exist it will throw an error */
-pure) {
+pure, debug) {
     return __awaiter(this, void 0, void 0, function () {
-        var err_5;
+        var err_6;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
@@ -241,9 +274,16 @@ pure) {
                 case 3:
                     _a.sent();
                     _a.label = 4;
-                case 4: return [2 /*return*/, Promise.resolve()];
+                case 4:
+                    if (debug) {
+                        console.log("firesdocup: " + pure ? "UPDATED" : "SET");
+                    }
+                    return [2 /*return*/, Promise.resolve()];
                 case 5:
-                    err_5 = _a.sent();
+                    err_6 = _a.sent();
+                    if (debug) {
+                        console.log({ firesdocup: err_6 });
+                    }
                     return [2 /*return*/, Promise.reject()];
                 case 6: return [2 /*return*/];
             }
@@ -252,9 +292,9 @@ pure) {
 }
 exports.firesdocup = firesdocup;
 /** Create the document */
-function firesdocrt(docpath, create) {
+function firesdocrt(docpath, create, debug) {
     return __awaiter(this, void 0, void 0, function () {
-        var err_6;
+        var err_7;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
@@ -262,9 +302,15 @@ function firesdocrt(docpath, create) {
                     return [4 /*yield*/, firestore.doc(docpath).create(create)];
                 case 1:
                     _a.sent();
+                    if (debug) {
+                        console.log("firesdocrt: " + "CREATED, DATA: " + create);
+                    }
                     return [2 /*return*/, Promise.resolve(create)];
                 case 2:
-                    err_6 = _a.sent();
+                    err_7 = _a.sent();
+                    if (debug) {
+                        console.log({ firesdocrt: err_7 });
+                    }
                     return [2 /*return*/, Promise.reject()];
                 case 3: return [2 /*return*/];
             }
@@ -273,9 +319,9 @@ function firesdocrt(docpath, create) {
 }
 exports.firesdocrt = firesdocrt;
 /** Delete the document */
-function firesdocdel(docpath) {
+function firesdocdel(docpath, debug) {
     return __awaiter(this, void 0, void 0, function () {
-        var err_7;
+        var err_8;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
@@ -283,9 +329,15 @@ function firesdocdel(docpath) {
                     return [4 /*yield*/, firestore.doc(docpath).delete()];
                 case 1:
                     _a.sent();
+                    if (debug) {
+                        console.log("firesdocdel: DELETED");
+                    }
                     return [2 /*return*/, Promise.resolve()];
                 case 2:
-                    err_7 = _a.sent();
+                    err_8 = _a.sent();
+                    if (debug) {
+                        console.log({ firesdocdel: err_8 });
+                    }
                     return [2 /*return*/, Promise.reject()];
                 case 3: return [2 /*return*/];
             }
@@ -298,9 +350,9 @@ exports.firesdocdel = firesdocdel;
  * @param colpath firestore collection path
  * @param query querys to filter collections
  */
-function firescol(colpath, query) {
+function firescol(colpath, query, debug) {
     return __awaiter(this, void 0, void 0, function () {
-        var base, querySnap, err_8;
+        var base, querySnap, err_9;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
@@ -333,9 +385,18 @@ function firescol(colpath, query) {
                                 message: "Not Found!",
                                 nonexistent: true,
                             })];
+                    if (debug) {
+                        console.log("firescol: LENGTH: " +
+                            querySnap.docs.map(function (doc) { return doc.data(); }).length +
+                            ", DATA: " +
+                            querySnap.docs.map(function (doc) { return doc.data(); }));
+                    }
                     return [2 /*return*/, querySnap.docs.map(function (doc) { return doc.data(); })];
                 case 2:
-                    err_8 = _a.sent();
+                    err_9 = _a.sent();
+                    if (debug) {
+                        console.log({ firescol: err_9 });
+                    }
                     return [2 /*return*/, Promise.reject()];
                 case 3: return [2 /*return*/];
             }
@@ -343,9 +404,9 @@ function firescol(colpath, query) {
     });
 }
 exports.firescol = firescol;
-function firesbatch(args) {
+function firesbatch(args, debug) {
     return __awaiter(this, void 0, void 0, function () {
-        var op_1, perBatch_1, FIRBASE_MAX_BATCH_DOC_COUNT, args500_1, into, loops, i, err_9;
+        var op_1, perBatch_1, FIRBASE_MAX_BATCH_DOC_COUNT, args500_1, into, loops, i, err_10;
         var _this = this;
         return __generator(this, function (_a) {
             switch (_a.label) {
@@ -364,17 +425,29 @@ function firesbatch(args) {
                                     arg.forEach(function (arg) {
                                         switch (arg[1]) {
                                             case "create":
+                                                if (debug) {
+                                                    console.log("firesbatch: CREATE, DATA: " + arg[2]);
+                                                }
                                                 batch.create(firestore.doc(arg[0]), arg[2]);
                                                 break;
                                             case "update":
                                                 if (arg[3]) {
+                                                    if (debug) {
+                                                        console.log("firesbatch: UPDATED");
+                                                    }
                                                     batch.update(firestore.doc(arg[0]), arg[2]);
                                                 }
                                                 else {
+                                                    if (debug) {
+                                                        console.log("firesbatch: SET");
+                                                    }
                                                     batch.set(firestore.doc(arg[0]), arg[2], { merge: true });
                                                 }
                                                 break;
                                             case "delete":
+                                                if (debug) {
+                                                    console.log("firesbatch: DELETE");
+                                                }
                                                 batch.delete(firestore.doc(arg[0]));
                                                 break;
                                         }
@@ -382,6 +455,9 @@ function firesbatch(args) {
                                     _b.label = 1;
                                 case 1:
                                     _b.trys.push([1, 3, , 4]);
+                                    if (debug) {
+                                        console.log("firesbatch: COMMITED");
+                                    }
                                     return [4 /*yield*/, batch.commit()];
                                 case 2:
                                     _b.sent();
@@ -403,6 +479,9 @@ function firesbatch(args) {
                                 switch (_a.label) {
                                     case 0: return [4 /*yield*/, perBatch_1(args, function (result) {
                                             result ? (op_1.success += args.length) : (op_1.fail += args.length);
+                                            if (debug) {
+                                                console.log("firesbatch: RESULT" + op_1);
+                                            }
                                             resolve(op_1);
                                         })];
                                     case 1:
@@ -418,6 +497,9 @@ function firesbatch(args) {
                     for (i = 0; i < loops; i++) {
                         args500_1.push(args.slice(i * into, i * into + into));
                     }
+                    if (debug) {
+                        console.log("firesbatch: " + args.length + "is split into " + loops);
+                    }
                     return [4 /*yield*/, new Promise(function (resolve) {
                             var promises = args500_1.length;
                             args500_1.forEach(function (arg) { return __awaiter(_this, void 0, void 0, function () {
@@ -431,6 +513,9 @@ function firesbatch(args) {
                                                     // all promises has been resolved
                                                     promises--;
                                                     if (promises === 0) {
+                                                        if (debug) {
+                                                            console.log("firesbatch: RESULT" + op_1);
+                                                        }
                                                         resolve(op_1);
                                                     }
                                                 })];
@@ -444,7 +529,10 @@ function firesbatch(args) {
                 case 2: return [2 /*return*/, _a.sent()];
                 case 3: return [3 /*break*/, 5];
                 case 4:
-                    err_9 = _a.sent();
+                    err_10 = _a.sent();
+                    if (debug) {
+                        console.log({ firesbatch: err_10 });
+                    }
                     return [2 /*return*/, Promise.reject()];
                 case 5: return [2 /*return*/];
             }
@@ -453,9 +541,9 @@ function firesbatch(args) {
 }
 exports.firesbatch = firesbatch;
 /** Fetch all docs at once */
-function firesdocall(docpaths) {
+function firesdocall(docpaths, debug) {
     return __awaiter(this, void 0, void 0, function () {
-        var docs, err_10;
+        var docs, err_11;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
@@ -464,6 +552,9 @@ function firesdocall(docpaths) {
                 case 1:
                     docs = _a.sent();
                     if (docs.length <= 0) {
+                        if (debug) {
+                            console.log("firesbatch: NO_DOC");
+                        }
                         return [2 /*return*/, Promise.reject({
                                 code: 404,
                                 message: "Not Found!",
@@ -472,7 +563,10 @@ function firesdocall(docpaths) {
                     }
                     return [2 /*return*/, docs.map(function (d) { return d.data(); })];
                 case 2:
-                    err_10 = _a.sent();
+                    err_11 = _a.sent();
+                    if (debug) {
+                        console.log({ firesdocall: err_11 });
+                    }
                     return [2 /*return*/, Promise.reject()];
                 case 3: return [2 /*return*/];
             }
@@ -481,7 +575,7 @@ function firesdocall(docpaths) {
 }
 exports.firesdocall = firesdocall;
 /** Transaction */
-function firesTransaction(func, maxAttempts) {
+function firesTransaction(func, maxAttempts, debug) {
     if (maxAttempts === void 0) { maxAttempts = 3; }
     return __awaiter(this, void 0, void 0, function () {
         var _this = this;
@@ -498,6 +592,9 @@ function firesTransaction(func, maxAttempts) {
                                             case 0: return [4 /*yield*/, transaction.get(admin.firestore().doc(docpath))];
                                             case 1:
                                                 snap = _a.sent();
+                                                if (debug) {
+                                                    console.log("firesTransaction: GET, DATA: " + snap.data());
+                                                }
                                                 return [2 /*return*/, snap.data()];
                                         }
                                     });
@@ -505,18 +602,30 @@ function firesTransaction(func, maxAttempts) {
                             },
                             update: function (docpath, data, pure) {
                                 if (pure) {
+                                    if (debug) {
+                                        console.log("firesTransaction: UPDATED");
+                                    }
                                     transaction.update(admin.firestore().doc(docpath), data);
                                 }
                                 else {
+                                    if (debug) {
+                                        console.log("firesTransaction: SET");
+                                    }
                                     transaction.set(admin.firestore().doc(docpath), data, {
                                         merge: true,
                                     });
                                 }
                             },
                             create: function (docpath, data) {
+                                if (debug) {
+                                    console.log("firesTransaction: CREATE, DATA: " + data);
+                                }
                                 transaction.create(admin.firestore().doc(docpath), data);
                             },
                             delete: function (docpath) {
+                                if (debug) {
+                                    console.log("firesTransaction: DELETE");
+                                }
                                 transaction.delete(admin.firestore().doc(docpath));
                             },
                         };

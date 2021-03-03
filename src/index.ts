@@ -28,7 +28,7 @@ export function firesColRef<Data>(colpath: string) {
 }
 
 /** Fetch the document */
-export async function firesdoc<Data>(docpath: string) {
+export async function firesdoc<Data>(docpath: string, debug?: boolean) {
   try {
     const snap = await firestore.doc(docpath).get();
     if (!snap.exists)
@@ -37,8 +37,17 @@ export async function firesdoc<Data>(docpath: string) {
         message: "Not Found!",
         nonexistent: true,
       });
+
+    if (debug) {
+      console.log("firesdoc: " + snap.data());
+    }
+
     return snap.data() as Data;
   } catch (err) {
+    if (debug) {
+      console.log({ firesdoc: err });
+    }
+
     return Promise.reject();
   }
 }
@@ -54,7 +63,7 @@ export async function isfiresdoc(docpath: string) {
 }
 
 /** Fetch the document (realtime database) */
-export async function rbdoc<Data>(docpath: string) {
+export async function rbdoc<Data>(docpath: string, debug?: boolean) {
   try {
     const ref = await realtime.ref(docpath).once("value");
     if (!ref.exists())
@@ -64,40 +73,82 @@ export async function rbdoc<Data>(docpath: string) {
         nonexistent: true,
       });
 
+    if (debug) {
+      console.log("rbdoc: " + ref.val());
+    }
+
     return ref.val() as Data;
   } catch (err) {
+    if (debug) {
+      console.log({ rbdoc: err });
+    }
+
     return Promise.reject();
   }
 }
 
 /** Update the document (realtime database) */
-export async function rbdocup<Data>(docpath: string, update: Data) {
+export async function rbdocup<Data>(
+  docpath: string,
+  update: Data,
+  debug?: boolean
+) {
   try {
     await realtime.ref(docpath).set(update);
 
+    if (debug) {
+      console.log("rbdocup: UPDATED");
+    }
+
     return Promise.resolve();
   } catch (err) {
+    if (debug) {
+      console.log({ rbdocup: err });
+    }
+
     return Promise.reject();
   }
 }
 
 /** Delete the document (realtime database) */
-export async function rbdocdel(docpath: string) {
+export async function rbdocdel(docpath: string, debug?: boolean) {
   try {
     await realtime.ref(docpath).remove();
 
+    if (debug) {
+      console.log("rbdocdel: DELETED");
+    }
+
     return Promise.resolve();
   } catch (err) {
+    if (debug) {
+      console.log({ rbdocdel: err });
+    }
+
     return Promise.reject();
   }
 }
 
 /** Get the collection (realtime database) */
-export async function rbcol<Data>(colpath: string) {
+export async function rbcol<Data>(colpath: string, debug?: boolean) {
   try {
     const refs = await realtime.ref(colpath).once("value");
+
+    if (debug) {
+      console.log(
+        "rbcol: KEYS_COUNT: " +
+          Object.values(refs.val()).length +
+          ", DATA: " +
+          Object.values(refs.val())
+      );
+    }
+
     return Object.values(refs.val()) as Data[];
-  } catch (error) {
+  } catch (err) {
+    if (debug) {
+      console.log({ rbcol: err });
+    }
+
     return Promise.reject();
   }
 }
@@ -107,7 +158,8 @@ export async function firesdocup<Data>(
   docpath: string,
   update: PartialDeep<Data>,
   /** if enabled, on document don't exist it will throw an error */
-  pure?: boolean
+  pure?: boolean,
+  debug?: boolean
 ) {
   try {
     if (pure) {
@@ -116,28 +168,58 @@ export async function firesdocup<Data>(
       await firestore.doc(docpath).set(update, { merge: true });
     }
 
+    if (debug) {
+      console.log("firesdocup: " + pure ? "UPDATED" : "SET");
+    }
+
     return Promise.resolve();
   } catch (err) {
+    if (debug) {
+      console.log({ firesdocup: err });
+    }
+
     return Promise.reject();
   }
 }
 
 /** Create the document */
-export async function firesdocrt<Data>(docpath: string, create: Data) {
+export async function firesdocrt<Data>(
+  docpath: string,
+  create: Data,
+  debug?: boolean
+) {
   try {
     await firestore.doc(docpath).create(create);
+
+    if (debug) {
+      console.log("firesdocrt: " + "CREATED, DATA: " + create);
+    }
+
     return Promise.resolve(create);
   } catch (err) {
+    if (debug) {
+      console.log({ firesdocrt: err });
+    }
+
     return Promise.reject();
   }
 }
 
 /** Delete the document */
-export async function firesdocdel(docpath: string) {
+export async function firesdocdel(docpath: string, debug?: boolean) {
   try {
     await firestore.doc(docpath).delete();
+
+    if (debug) {
+      console.log("firesdocdel: DELETED");
+    }
+
     return Promise.resolve();
   } catch (err) {
+    if (debug) {
+      console.log({ firesdocdel: err });
+    }
+
     return Promise.reject();
   }
 }
@@ -177,7 +259,8 @@ export async function firescol<Data>(
     offset?: number;
     orderBy?: [keyof Data, "desc" | "asc"];
     where?: FirescolWhere<Data>;
-  }
+  },
+  debug?: boolean
 ) {
   try {
     var base: any = firestore.collection(colpath);
@@ -203,8 +286,21 @@ export async function firescol<Data>(
         nonexistent: true,
       });
 
+    if (debug) {
+      console.log(
+        "firescol: LENGTH: " +
+          querySnap.docs.map((doc) => doc.data()).length +
+          ", DATA: " +
+          querySnap.docs.map((doc) => doc.data())
+      );
+    }
+
     return querySnap.docs.map((doc) => doc.data());
   } catch (err) {
+    if (debug) {
+      console.log({ firescol: err });
+    }
+
     return Promise.reject();
   }
 }
@@ -225,7 +321,8 @@ type BatchOP = {
   fail: number;
 };
 export async function firesbatch<Data>(
-  args: FiresbatchArgs<Data>
+  args: FiresbatchArgs<Data>,
+  debug?: boolean
 ): Promise<BatchOP> {
   try {
     const op: BatchOP = {
@@ -241,21 +338,41 @@ export async function firesbatch<Data>(
       arg.forEach((arg) => {
         switch (arg[1]) {
           case "create":
+            if (debug) {
+              console.log("firesbatch: CREATE, DATA: " + arg[2]);
+            }
+
             batch.create(firestore.doc(arg[0]), arg[2]);
             break;
           case "update":
             if (arg[3]) {
+              if (debug) {
+                console.log("firesbatch: UPDATED");
+              }
+
               batch.update(firestore.doc(arg[0]), arg[2]);
             } else {
+              if (debug) {
+                console.log("firesbatch: SET");
+              }
+
               batch.set(firestore.doc(arg[0]), arg[2], { merge: true });
             }
             break;
           case "delete":
+            if (debug) {
+              console.log("firesbatch: DELETE");
+            }
+
             batch.delete(firestore.doc(arg[0]));
             break;
         }
       });
       try {
+        if (debug) {
+          console.log("firesbatch: COMMITED");
+        }
+
         await batch.commit();
         onOperationDone && onOperationDone(true);
       } catch {
@@ -269,6 +386,11 @@ export async function firesbatch<Data>(
       return new Promise(async (resolve) => {
         await perBatch(args, (result) => {
           result ? (op.success += args.length) : (op.fail += args.length);
+
+          if (debug) {
+            console.log("firesbatch: RESULT" + op);
+          }
+
           resolve(op);
         });
       });
@@ -280,6 +402,10 @@ export async function firesbatch<Data>(
       let loops = Math.ceil(args.length / into);
       for (let i = 0; i < loops; i++) {
         args500.push(args.slice(i * into, i * into + into));
+      }
+
+      if (debug) {
+        console.log("firesbatch: " + args.length + "is split into " + loops);
       }
 
       return await new Promise((resolve) => {
@@ -294,6 +420,10 @@ export async function firesbatch<Data>(
             // all promises has been resolved
             promises--;
             if (promises === 0) {
+              if (debug) {
+                console.log("firesbatch: RESULT" + op);
+              }
+
               resolve(op);
             }
           });
@@ -301,14 +431,22 @@ export async function firesbatch<Data>(
       });
     }
   } catch (err) {
+    if (debug) {
+      console.log({ firesbatch: err });
+    }
+
     return Promise.reject();
   }
 }
 /** Fetch all docs at once */
-export async function firesdocall<Data>(docpaths: string[]) {
+export async function firesdocall<Data>(docpaths: string[], debug?: boolean) {
   try {
     const docs = await firestore.getAll(...(docpaths.map(firesDocRef) as any));
     if (docs.length <= 0) {
+      if (debug) {
+        console.log("firesbatch: NO_DOC");
+      }
+
       return Promise.reject({
         code: 404,
         message: "Not Found!",
@@ -318,6 +456,10 @@ export async function firesdocall<Data>(docpaths: string[]) {
 
     return docs.map((d) => d.data()) as Data[];
   } catch (err) {
+    if (debug) {
+      console.log({ firesdocall: err });
+    }
+
     return Promise.reject();
   }
 }
@@ -331,7 +473,8 @@ export interface Transaction {
 /** Transaction */
 export async function firesTransaction(
   func: (transaction: Transaction) => unknown,
-  maxAttempts = 3
+  maxAttempts = 3,
+  debug?: boolean
 ) {
   return firestore.runTransaction(
     async (transaction) => {
@@ -339,13 +482,26 @@ export async function firesTransaction(
       const trans: Transaction = {
         async get<Data>(docpath: string) {
           const snap = await transaction.get(admin.firestore().doc(docpath));
+
+          if (debug) {
+            console.log("firesTransaction: GET, DATA: " + snap.data());
+          }
+
           return snap.data() as Data;
         },
 
         update<Data>(docpath: string, data: PartialDeep<Data>, pure?: boolean) {
           if (pure) {
+            if (debug) {
+              console.log("firesTransaction: UPDATED");
+            }
+
             transaction.update(admin.firestore().doc(docpath), data);
           } else {
+            if (debug) {
+              console.log("firesTransaction: SET");
+            }
+
             transaction.set(admin.firestore().doc(docpath), data, {
               merge: true,
             });
@@ -353,10 +509,18 @@ export async function firesTransaction(
         },
 
         create<Data>(docpath: string, data: Data) {
+          if (debug) {
+            console.log("firesTransaction: CREATE, DATA: " + data);
+          }
+
           transaction.create(admin.firestore().doc(docpath), data);
         },
 
         delete(docpath: string) {
+          if (debug) {
+            console.log("firesTransaction: DELETE");
+          }
+
           transaction.delete(admin.firestore().doc(docpath));
         },
       };

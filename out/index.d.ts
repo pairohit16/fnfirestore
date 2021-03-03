@@ -8,25 +8,25 @@ export declare function firesDocRef<Data>(docpath: string): FirebaseFirestore.Do
 /** Collection Reference */
 export declare function firesColRef<Data>(colpath: string): FirebaseFirestore.CollectionReference<Data>;
 /** Fetch the document */
-export declare function firesdoc<Data>(docpath: string): Promise<Data>;
+export declare function firesdoc<Data>(docpath: string, debug?: boolean): Promise<Data>;
 /** check weather document exists */
 export declare function isfiresdoc(docpath: string): Promise<boolean>;
 /** Fetch the document (realtime database) */
-export declare function rbdoc<Data>(docpath: string): Promise<Data>;
+export declare function rbdoc<Data>(docpath: string, debug?: boolean): Promise<Data>;
 /** Update the document (realtime database) */
-export declare function rbdocup<Data>(docpath: string, update: Data): Promise<void>;
+export declare function rbdocup<Data>(docpath: string, update: Data, debug?: boolean): Promise<void>;
 /** Delete the document (realtime database) */
-export declare function rbdocdel(docpath: string): Promise<void>;
+export declare function rbdocdel(docpath: string, debug?: boolean): Promise<void>;
 /** Get the collection (realtime database) */
-export declare function rbcol<Data>(colpath: string): Promise<Data[]>;
+export declare function rbcol<Data>(colpath: string, debug?: boolean): Promise<Data[]>;
 /** Update the document */
 export declare function firesdocup<Data>(docpath: string, update: PartialDeep<Data>, 
 /** if enabled, on document don't exist it will throw an error */
-pure?: boolean): Promise<void>;
+pure?: boolean, debug?: boolean): Promise<void>;
 /** Create the document */
-export declare function firesdocrt<Data>(docpath: string, create: Data): Promise<Data>;
+export declare function firesdocrt<Data>(docpath: string, create: Data, debug?: boolean): Promise<Data>;
 /** Delete the document */
-export declare function firesdocdel(docpath: string): Promise<void>;
+export declare function firesdocdel(docpath: string, debug?: boolean): Promise<void>;
 export declare type FirescolWhere<Data> = [
     keyof Data,
     "<" | "<=" | "==" | ">=" | ">" | "!=",
@@ -54,7 +54,7 @@ export declare function firescol<Data>(colpath: string, query?: {
     offset?: number;
     orderBy?: [keyof Data, "desc" | "asc"];
     where?: FirescolWhere<Data>;
-}): Promise<Data[]>;
+}, debug?: boolean): Promise<Data[]>;
 export declare type FiresbatchArgs<Data> = ([docpath: string, operation: "create", data: Data] | [
     docpath: string,
     operation: "update",
@@ -66,9 +66,9 @@ declare type BatchOP = {
     success: number;
     fail: number;
 };
-export declare function firesbatch<Data>(args: FiresbatchArgs<Data>): Promise<BatchOP>;
+export declare function firesbatch<Data>(args: FiresbatchArgs<Data>, debug?: boolean): Promise<BatchOP>;
 /** Fetch all docs at once */
-export declare function firesdocall<Data>(docpaths: string[]): Promise<Data[]>;
+export declare function firesdocall<Data>(docpaths: string[], debug?: boolean): Promise<Data[]>;
 export interface Transaction {
     get<Data>(docpath: string): Promise<Data>;
     update<Data>(docpath: string, data: PartialDeep<Data>, pure?: boolean): void;
@@ -76,6 +76,6 @@ export interface Transaction {
     delete(docpath: string): void;
 }
 /** Transaction */
-export declare function firesTransaction(func: (transaction: Transaction) => unknown, maxAttempts?: number): Promise<unknown>;
+export declare function firesTransaction(func: (transaction: Transaction) => unknown, maxAttempts?: number, debug?: boolean): Promise<unknown>;
 export {};
 //# sourceMappingURL=index.d.ts.map
