@@ -73,6 +73,7 @@ export declare function firesbatch<Data>(args: FiresbatchArgs<Data>, debug?: boo
 export declare function firesdocall<Data>(docpaths: string[], debug?: boolean): Promise<Data[]>;
 export interface Transaction {
     get<Data>(docpath: string): Promise<Data>;
+    getAll<Data>(docpaths: string[]): Promise<Data[]>;
     update<Data>(docpath: string, data: PartialDeep<Data>, pure?: boolean): void;
     create<Data>(docpath: string, data: Data): void;
     delete(docpath: string): void;

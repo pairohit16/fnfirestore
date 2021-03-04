@@ -108,7 +108,7 @@ function firesdoc(docpath, debug) {
                                 nonexistent: true,
                             })];
                     if (debug) {
-                        console.log("firesdoc: " + snap.data());
+                        console.log("firesdoc: " + JSON.stringify(snap.data(), null, 2));
                     }
                     return [2 /*return*/, snap.data()];
                 case 2:
@@ -162,7 +162,7 @@ function rbdoc(docpath, debug) {
                                 nonexistent: true,
                             })];
                     if (debug) {
-                        console.log("rbdoc: " + ref.val());
+                        console.log("rbdoc: " + JSON.stringify(ref.val(), null, 2));
                     }
                     return [2 /*return*/, ref.val()];
                 case 2:
@@ -246,7 +246,7 @@ function rbcol(colpath, debug) {
                         console.log("rbcol: KEYS_COUNT: " +
                             Object.values(refs.val()).length +
                             ", DATA: " +
-                            Object.values(refs.val()));
+                            JSON.stringify(Object.values(refs.val()), null, 2));
                     }
                     return [2 /*return*/, Object.values(refs.val())];
                 case 2:
@@ -309,7 +309,7 @@ function firesdocrt(docpath, create, debug) {
                 case 1:
                     _a.sent();
                     if (debug) {
-                        console.log("firesdocrt: " + "CREATED, DATA: " + create);
+                        console.log("firesdocrt: " + "CREATED, DATA: " + JSON.stringify(create, null, 2));
                     }
                     return [2 /*return*/, Promise.resolve(create)];
                 case 2:
@@ -395,7 +395,7 @@ function firescol(colpath, query, debug) {
                         console.log("firescol: LENGTH: " +
                             querySnap.docs.map(function (doc) { return doc.data(); }).length +
                             ", DATA: " +
-                            querySnap.docs.map(function (doc) { return doc.data(); }));
+                            JSON.stringify(querySnap.docs.map(function (doc) { return doc.data(); }), null, 2));
                     }
                     return [2 /*return*/, querySnap.docs.map(function (doc) { return doc.data(); })];
                 case 2:
@@ -432,7 +432,7 @@ function firesbatch(args, debug) {
                                         switch (arg[1]) {
                                             case "create":
                                                 if (debug) {
-                                                    console.log("firesbatch: CREATE, DATA: " + arg[2]);
+                                                    console.log("firesbatch: CREATE, DATA: " + JSON.stringify(arg[2], null, 2));
                                                 }
                                                 batch.create(firestore.doc(arg[0]), arg[2]);
                                                 break;
@@ -486,7 +486,7 @@ function firesbatch(args, debug) {
                                     case 0: return [4 /*yield*/, perBatch_1(args, function (result) {
                                             result ? (op_1.success += args.length) : (op_1.fail += args.length);
                                             if (debug) {
-                                                console.log("firesbatch: RESULT" + op_1);
+                                                console.log("firesbatch: RESULT" + JSON.stringify(op_1, null, 2));
                                             }
                                             resolve(op_1);
                                         })];
@@ -520,7 +520,7 @@ function firesbatch(args, debug) {
                                                     promises--;
                                                     if (promises === 0) {
                                                         if (debug) {
-                                                            console.log("firesbatch: RESULT" + op_1);
+                                                            console.log("firesbatch: RESULT" + JSON.stringify(op_1, null, 2));
                                                         }
                                                         resolve(op_1);
                                                     }
@@ -595,13 +595,37 @@ function firesTransaction(func, maxAttempts, debug) {
                                     var snap;
                                     return __generator(this, function (_a) {
                                         switch (_a.label) {
-                                            case 0: return [4 /*yield*/, transaction.get(admin.firestore().doc(docpath))];
+                                            case 0: return [4 /*yield*/, transaction.get(firesDocRef(docpath))];
                                             case 1:
                                                 snap = _a.sent();
                                                 if (debug) {
-                                                    console.log("firesTransaction: GET, DATA: " + snap.data());
+                                                    console.log("firesTransaction: GET, DATA: " +
+                                                        JSON.stringify(snap.data(), null, 2));
                                                 }
                                                 return [2 /*return*/, snap.data()];
+                                        }
+                                    });
+                                });
+                            },
+                            getAll: function (docpaths) {
+                                return __awaiter(this, void 0, void 0, function () {
+                                    var docs;
+                                    return __generator(this, function (_a) {
+                                        switch (_a.label) {
+                                            case 0: return [4 /*yield*/, transaction.getAll.apply(transaction, docpaths.map(function (doc) { return firesDocRef(doc); }))];
+                                            case 1:
+                                                docs = _a.sent();
+                                                if (docs.length <= 0) {
+                                                    if (debug) {
+                                                        console.log("firesTransaction: NO_DOC");
+                                                    }
+                                                    return [2 /*return*/, Promise.reject({
+                                                            code: 404,
+                                                            message: "Not Found!",
+                                                            nonexistent: true,
+                                                        })];
+                                                }
+                                                return [2 /*return*/, docs.map(function (d) { return d.data(); })];
                                         }
                                     });
                                 });
@@ -611,28 +635,28 @@ function firesTransaction(func, maxAttempts, debug) {
                                     if (debug) {
                                         console.log("firesTransaction: UPDATED");
                                     }
-                                    transaction.update(admin.firestore().doc(docpath), data);
+                                    transaction.update(firesDocRef(docpath), data);
                                 }
                                 else {
                                     if (debug) {
                                         console.log("firesTransaction: SET");
                                     }
-                                    transaction.set(admin.firestore().doc(docpath), data, {
+                                    transaction.set(firesDocRef(docpath), data, {
                                         merge: true,
                                     });
                                 }
                             },
                             create: function (docpath, data) {
                                 if (debug) {
-                                    console.log("firesTransaction: CREATE, DATA: " + data);
+                                    console.log("firesTransaction: CREATE, DATA: " + JSON.stringify(data, null, 2));
                                 }
-                                transaction.create(admin.firestore().doc(docpath), data);
+                                transaction.create(firesDocRef(docpath), data);
                             },
                             delete: function (docpath) {
                                 if (debug) {
                                     console.log("firesTransaction: DELETE");
                                 }
-                                transaction.delete(admin.firestore().doc(docpath));
+                                transaction.delete(firesDocRef(docpath));
                             },
                         };
                         return [2 /*return*/, func(trans)];
