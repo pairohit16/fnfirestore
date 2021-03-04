@@ -55,7 +55,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.firesTransaction = exports.firesdocall = exports.firesbatch = exports.firescol = exports.firesdocdel = exports.firesdocrt = exports.firesdocup = exports.rbcol = exports.rbdocdel = exports.rbdocup = exports.rbdoc = exports.isfiresdoc = exports.firesdoc = exports.firesColRef = exports.firesDocRef = exports.firesArrayUnion = exports.firesIncrementBy = void 0;
+exports.firesTransaction = exports.firesdocall = exports.firesbatch = exports.firescol = exports.firesdocdel = exports.firesdocrt = exports.firesdocup = exports.rbcol = exports.rbdocdel = exports.rbdocup = exports.rbdoc = exports.isfiresdoc = exports.firesdoc = exports.firesColRef = exports.firesDocRef = exports.firesArrayRemove = exports.firesArrayUnion = exports.firesIncrementBy = void 0;
 var admin = __importStar(require("firebase-admin"));
 var firestore = admin.firestore();
 var realtime = admin.database();
@@ -70,6 +70,12 @@ function firesArrayUnion(element) {
     return (_a = admin.firestore.FieldValue).arrayUnion.apply(_a, element);
 }
 exports.firesArrayUnion = firesArrayUnion;
+/** Array Union */
+function firesArrayRemove(element) {
+    var _a;
+    return (_a = admin.firestore.FieldValue).arrayRemove.apply(_a, element);
+}
+exports.firesArrayRemove = firesArrayRemove;
 /** Document Reference */
 function firesDocRef(docpath) {
     return admin

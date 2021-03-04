@@ -12,6 +12,10 @@ export function firesIncrementBy(number: number): number {
 export function firesArrayUnion<Element>(element: Element[]): Element[] {
   return admin.firestore.FieldValue.arrayUnion(...element) as any;
 }
+/** Array Union */
+export function firesArrayRemove<Element>(element: Element[]): Element[] {
+  return admin.firestore.FieldValue.arrayRemove(...element) as any;
+}
 
 /** Document Reference */
 export function firesDocRef<Data>(docpath: string) {
