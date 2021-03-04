@@ -43,7 +43,7 @@ export async function firesdoc<Data>(docpath: string, debug?: boolean) {
       });
 
     if (debug) {
-      console.log("firesdoc: " + snap.data());
+      console.log("firesdoc: " + JSON.stringify(snap.data(), null, 2));
     }
 
     return snap.data() as Data;
@@ -78,7 +78,7 @@ export async function rbdoc<Data>(docpath: string, debug?: boolean) {
       });
 
     if (debug) {
-      console.log("rbdoc: " + ref.val());
+      console.log("rbdoc: " + JSON.stringify(ref.val(), null, 2));
     }
 
     return ref.val() as Data;
@@ -143,7 +143,7 @@ export async function rbcol<Data>(colpath: string, debug?: boolean) {
         "rbcol: KEYS_COUNT: " +
           Object.values(refs.val()).length +
           ", DATA: " +
-          Object.values(refs.val())
+          JSON.stringify(Object.values(refs.val()), null, 2)
       );
     }
 
@@ -196,7 +196,9 @@ export async function firesdocrt<Data>(
     await firestore.doc(docpath).create(create);
 
     if (debug) {
-      console.log("firesdocrt: " + "CREATED, DATA: " + create);
+      console.log(
+        "firesdocrt: " + "CREATED, DATA: " + JSON.stringify(create, null, 2)
+      );
     }
 
     return Promise.resolve(create);
@@ -295,7 +297,11 @@ export async function firescol<Data>(
         "firescol: LENGTH: " +
           querySnap.docs.map((doc) => doc.data()).length +
           ", DATA: " +
-          querySnap.docs.map((doc) => doc.data())
+          JSON.stringify(
+            querySnap.docs.map((doc) => doc.data()),
+            null,
+            2
+          )
       );
     }
 
@@ -343,7 +349,9 @@ export async function firesbatch<Data>(
         switch (arg[1]) {
           case "create":
             if (debug) {
-              console.log("firesbatch: CREATE, DATA: " + arg[2]);
+              console.log(
+                "firesbatch: CREATE, DATA: " + JSON.stringify(arg[2], null, 2)
+              );
             }
 
             batch.create(firestore.doc(arg[0]), arg[2]);
@@ -392,7 +400,7 @@ export async function firesbatch<Data>(
           result ? (op.success += args.length) : (op.fail += args.length);
 
           if (debug) {
-            console.log("firesbatch: RESULT" + op);
+            console.log("firesbatch: RESULT" + JSON.stringify(op, null, 2));
           }
 
           resolve(op);
@@ -425,7 +433,7 @@ export async function firesbatch<Data>(
             promises--;
             if (promises === 0) {
               if (debug) {
-                console.log("firesbatch: RESULT" + op);
+                console.log("firesbatch: RESULT" + JSON.stringify(op, null, 2));
               }
 
               resolve(op);
@@ -470,6 +478,7 @@ export async function firesdocall<Data>(docpaths: string[], debug?: boolean) {
 
 export interface Transaction {
   get<Data>(docpath: string): Promise<Data>;
+  getAll<Data>(docpaths: string[]): Promise<Data[]>;
   update<Data>(docpath: string, data: PartialDeep<Data>, pure?: boolean): void;
   create<Data>(docpath: string, data: Data): void;
   delete(docpath: string): void;
@@ -485,13 +494,35 @@ export async function firesTransaction(
       // my custom transaction
       const trans: Transaction = {
         async get<Data>(docpath: string) {
-          const snap = await transaction.get(admin.firestore().doc(docpath));
+          const snap = await transaction.get(firesDocRef(docpath));
 
           if (debug) {
-            console.log("firesTransaction: GET, DATA: " + snap.data());
+            console.log(
+              "firesTransaction: GET, DATA: " +
+                JSON.stringify(snap.data(), null, 2)
+            );
           }
 
           return snap.data() as Data;
+        },
+
+        async getAll<Data>(docpaths: string[]) {
+          const docs = await transaction.getAll(
+            ...docpaths.map((doc) => firesDocRef(doc))
+          );
+
+          if (docs.length <= 0) {
+            if (debug) {
+              console.log("firesTransaction: NO_DOC");
+            }
+
+            return Promise.reject({
+              code: 404,
+              message: "Not Found!",
+              nonexistent: true,
+            });
+          }
+          return docs.map((d) => d.data()) as Data[];
         },
 
         update<Data>(docpath: string, data: PartialDeep<Data>, pure?: boolean) {
@@ -500,13 +531,13 @@ export async function firesTransaction(
               console.log("firesTransaction: UPDATED");
             }
 
-            transaction.update(admin.firestore().doc(docpath), data);
+            transaction.update(firesDocRef(docpath), data);
           } else {
             if (debug) {
               console.log("firesTransaction: SET");
             }
 
-            transaction.set(admin.firestore().doc(docpath), data, {
+            transaction.set(firesDocRef(docpath), data, {
               merge: true,
             });
           }
@@ -514,10 +545,12 @@ export async function firesTransaction(
 
         create<Data>(docpath: string, data: Data) {
           if (debug) {
-            console.log("firesTransaction: CREATE, DATA: " + data);
+            console.log(
+              "firesTransaction: CREATE, DATA: " + JSON.stringify(data, null, 2)
+            );
           }
 
-          transaction.create(admin.firestore().doc(docpath), data);
+          transaction.create(firesDocRef(docpath), data);
         },
 
         delete(docpath: string) {
@@ -525,7 +558,7 @@ export async function firesTransaction(
             console.log("firesTransaction: DELETE");
           }
 
-          transaction.delete(admin.firestore().doc(docpath));
+          transaction.delete(firesDocRef(docpath));
         },
       };
 
