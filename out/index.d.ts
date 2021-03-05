@@ -41,7 +41,7 @@ export declare type FirescolWhere<Data> = [
     keyof Data,
     "<" | "<=" | "==" | ">=" | ">" | "!=",
     string | boolean | number
-][] | [
+] | [
     keyof Data,
     "array-contains" | "in" | "not-in" | "array-contains-any",
     (string | boolean | number)[]
