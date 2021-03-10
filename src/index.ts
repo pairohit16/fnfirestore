@@ -1,5 +1,5 @@
 import * as admin from "firebase-admin";
-import { PartialDeep } from "./custom-types";
+import {PartialDeep} from "./custom-types";
 const firestore = admin.firestore();
 const realtime = admin.database();
 
@@ -19,16 +19,12 @@ export function firesArrayRemove<Element>(element: Element[]): Element[] {
 
 /** Document Reference */
 export function firesDocRef<Data>(docpath: string) {
-  return admin
-    .firestore()
-    .doc(docpath) as admin.firestore.DocumentReference<Data>;
+  return admin.firestore().doc(docpath) as admin.firestore.DocumentReference<Data>;
 }
 
 /** Collection Reference */
 export function firesColRef<Data>(colpath: string) {
-  return admin
-    .firestore()
-    .collection(colpath) as admin.firestore.CollectionReference<Data>;
+  return admin.firestore().collection(colpath) as admin.firestore.CollectionReference<Data>;
 }
 
 /** Fetch the document */
@@ -49,7 +45,7 @@ export async function firesdoc<Data>(docpath: string, debug?: boolean) {
     return snap.data() as Data;
   } catch (err) {
     if (debug) {
-      console.log({ firesdoc: err });
+      console.log({firesdoc: err});
     }
 
     return Promise.reject();
@@ -84,7 +80,7 @@ export async function rbdoc<Data>(docpath: string, debug?: boolean) {
     return ref.val() as Data;
   } catch (err) {
     if (debug) {
-      console.log({ rbdoc: err });
+      console.log({rbdoc: err});
     }
 
     return Promise.reject();
@@ -92,11 +88,7 @@ export async function rbdoc<Data>(docpath: string, debug?: boolean) {
 }
 
 /** Update the document (realtime database) */
-export async function rbdocup<Data>(
-  docpath: string,
-  update: Data,
-  debug?: boolean
-) {
+export async function rbdocup<Data>(docpath: string, update: Data, debug?: boolean) {
   try {
     await realtime.ref(docpath).set(update);
 
@@ -107,7 +99,7 @@ export async function rbdocup<Data>(
     return Promise.resolve();
   } catch (err) {
     if (debug) {
-      console.log({ rbdocup: err });
+      console.log({rbdocup: err});
     }
 
     return Promise.reject();
@@ -126,7 +118,7 @@ export async function rbdocdel(docpath: string, debug?: boolean) {
     return Promise.resolve();
   } catch (err) {
     if (debug) {
-      console.log({ rbdocdel: err });
+      console.log({rbdocdel: err});
     }
 
     return Promise.reject();
@@ -143,14 +135,14 @@ export async function rbcol<Data>(colpath: string, debug?: boolean) {
         "rbcol: KEYS_COUNT: " +
           Object.values(refs.val()).length +
           ", DATA: " +
-          JSON.stringify(Object.values(refs.val()), null, 2)
+          JSON.stringify(Object.values(refs.val()), null, 2),
       );
     }
 
     return Object.values(refs.val()) as Data[];
   } catch (err) {
     if (debug) {
-      console.log({ rbcol: err });
+      console.log({rbcol: err});
     }
 
     return Promise.reject();
@@ -163,13 +155,13 @@ export async function firesdocup<Data>(
   update: PartialDeep<Data>,
   /** if enabled, on document don't exist it will throw an error */
   pure?: boolean,
-  debug?: boolean
+  debug?: boolean,
 ) {
   try {
     if (pure) {
       await firestore.doc(docpath).update(update);
     } else {
-      await firestore.doc(docpath).set(update, { merge: true });
+      await firestore.doc(docpath).set(update, {merge: true});
     }
 
     if (debug) {
@@ -179,7 +171,7 @@ export async function firesdocup<Data>(
     return Promise.resolve();
   } catch (err) {
     if (debug) {
-      console.log({ firesdocup: err });
+      console.log({firesdocup: err});
     }
 
     return Promise.reject();
@@ -187,24 +179,18 @@ export async function firesdocup<Data>(
 }
 
 /** Create the document */
-export async function firesdocrt<Data>(
-  docpath: string,
-  create: Data,
-  debug?: boolean
-) {
+export async function firesdocrt<Data>(docpath: string, create: Data, debug?: boolean) {
   try {
     await firestore.doc(docpath).create(create);
 
     if (debug) {
-      console.log(
-        "firesdocrt: " + "CREATED, DATA: " + JSON.stringify(create, null, 2)
-      );
+      console.log("firesdocrt: " + "CREATED, DATA: " + JSON.stringify(create, null, 2));
     }
 
     return Promise.resolve(create);
   } catch (err) {
     if (debug) {
-      console.log({ firesdocrt: err });
+      console.log({firesdocrt: err});
     }
 
     return Promise.reject();
@@ -223,7 +209,7 @@ export async function firesdocdel(docpath: string, debug?: boolean) {
     return Promise.resolve();
   } catch (err) {
     if (debug) {
-      console.log({ firesdocdel: err });
+      console.log({firesdocdel: err});
     }
 
     return Promise.reject();
@@ -231,27 +217,11 @@ export async function firesdocdel(docpath: string, debug?: boolean) {
 }
 
 export type FirescolWhere<Data> =
-  | [
-      keyof Data,
-      "<" | "<=" | "==" | ">=" | ">" | "!=",
-      string | boolean | number
-    ]
-  | [
-      keyof Data,
-      "array-contains" | "in" | "not-in" | "array-contains-any",
-      (string | boolean | number)[]
-    ]
+  | [keyof Data, "<" | "<=" | "==" | ">=" | ">" | "!=", string | boolean | number]
+  | [keyof Data, "array-contains" | "in" | "not-in" | "array-contains-any", (string | boolean | number)[]]
   | (
-      | [
-          keyof Data,
-          "<" | "<=" | "==" | ">=" | ">" | "!=",
-          string | boolean | number
-        ]
-      | [
-          keyof Data,
-          "array-contains" | "in" | "not-in" | "array-contains-any",
-          (string | boolean | number)[]
-        ]
+      | [keyof Data, "<" | "<=" | "==" | ">=" | ">" | "!=", string | boolean | number]
+      | [keyof Data, "array-contains" | "in" | "not-in" | "array-contains-any", (string | boolean | number)[]]
     )[];
 /**
  * Query firestore collection
@@ -261,21 +231,36 @@ export type FirescolWhere<Data> =
 export async function firescol<Data>(
   colpath: string,
   query?: {
+    /**
+     * Field values provider here must be same field value provided
+     * in the orderBy query, otherwise firestore will throw error
+     */
+    startAfter?: any;
     limit?: number;
     offset?: number;
-    orderBy?: [keyof Data, "desc" | "asc"];
+    orderBy?: [keyof Data, "desc" | "asc"] | [keyof Data];
+    /** Beware if you are using startAfter ,
+     * don't use where otherwise firebase will throw error! */
     where?: FirescolWhere<Data>;
+    dontThrowOnEmpty?: boolean;
   },
-  debug?: boolean
+  debug?: boolean,
 ) {
   try {
     var base: any = firestore.collection(colpath);
     if (query?.limit) base = base.limit(query.limit);
     if (query?.offset) base = base.offset(query.offset);
-    if (query?.orderBy) base = base.orderBy(query.orderBy[0], query.orderBy[1]);
+    if (query?.orderBy) {
+      if (query.orderBy[1]) {
+        base = base.orderBy(query.orderBy[0], query.orderBy[1]);
+      } else {
+        base = base.orderBy(query.orderBy[0]);
+      }
+    }
+    if (query?.startAfter) base = base.startAfter(query.startAfter);
     if (query?.where) {
       if (Array.isArray(query.where[0])) {
-        query.where.forEach((_where) => {
+        query.where.forEach((_where: any) => {
           if (!_where[0]) return;
           base = base.where(_where[0], _where[1], _where[2]);
         });
@@ -285,12 +270,15 @@ export async function firescol<Data>(
     }
 
     const querySnap = (await base.get()) as admin.firestore.QuerySnapshot<Data>;
-    if (querySnap.empty)
+    if (querySnap.empty) {
+      if (query.dontThrowOnEmpty) return [];
+
       return Promise.reject({
         code: 404,
         message: "Not Found!",
         nonexistent: true,
       });
+    }
 
     if (debug) {
       console.log(
@@ -300,15 +288,15 @@ export async function firescol<Data>(
           JSON.stringify(
             querySnap.docs.map((doc) => doc.data()),
             null,
-            2
-          )
+            2,
+          ),
       );
     }
 
     return querySnap.docs.map((doc) => doc.data());
   } catch (err) {
     if (debug) {
-      console.log({ firescol: err });
+      console.log({firescol: err});
     }
 
     return Promise.reject();
@@ -317,12 +305,7 @@ export async function firescol<Data>(
 
 export type FiresbatchArgs<Data> = (
   | [docpath: string, operation: "create", data: Data]
-  | [
-      docpath: string,
-      operation: "update",
-      data: PartialDeep<Data>,
-      pure?: boolean
-    ]
+  | [docpath: string, operation: "update", data: PartialDeep<Data>, pure?: boolean]
   | [docpath: string, operation: "delete"]
 )[];
 /** Batch firestore function */
@@ -330,28 +313,20 @@ type BatchOP = {
   success: number;
   fail: number;
 };
-export async function firesbatch<Data>(
-  args: FiresbatchArgs<Data>,
-  debug?: boolean
-): Promise<BatchOP> {
+export async function firesbatch<Data>(args: FiresbatchArgs<Data>, debug?: boolean): Promise<BatchOP> {
   try {
     const op: BatchOP = {
       success: 0,
       fail: 0,
     };
-    const perBatch = async (
-      arg: FiresbatchArgs<Data>,
-      onOperationDone?: (result: boolean) => any
-    ) => {
+    const perBatch = async (arg: FiresbatchArgs<Data>, onOperationDone?: (result: boolean) => any) => {
       const batch = firestore.batch();
 
       arg.forEach((arg) => {
         switch (arg[1]) {
           case "create":
             if (debug) {
-              console.log(
-                "firesbatch: CREATE, DATA: " + JSON.stringify(arg[2], null, 2)
-              );
+              console.log("firesbatch: CREATE, DATA: " + JSON.stringify(arg[2], null, 2));
             }
 
             batch.create(firestore.doc(arg[0]), arg[2]);
@@ -368,7 +343,7 @@ export async function firesbatch<Data>(
                 console.log("firesbatch: SET");
               }
 
-              batch.set(firestore.doc(arg[0]), arg[2], { merge: true });
+              batch.set(firestore.doc(arg[0]), arg[2], {merge: true});
             }
             break;
           case "delete":
@@ -444,7 +419,7 @@ export async function firesbatch<Data>(
     }
   } catch (err) {
     if (debug) {
-      console.log({ firesbatch: err });
+      console.log({firesbatch: err});
     }
 
     return Promise.reject();
@@ -469,7 +444,7 @@ export async function firesdocall<Data>(docpaths: string[], debug?: boolean) {
     return docs.map((d) => d.data()) as Data[];
   } catch (err) {
     if (debug) {
-      console.log({ firesdocall: err });
+      console.log({firesdocall: err});
     }
 
     return Promise.reject();
@@ -487,7 +462,7 @@ export interface Transaction {
 export async function firesTransaction(
   func: (transaction: Transaction) => unknown,
   maxAttempts = 3,
-  debug?: boolean
+  debug?: boolean,
 ) {
   return firestore.runTransaction(
     async (transaction) => {
@@ -497,19 +472,14 @@ export async function firesTransaction(
           const snap = await transaction.get(firesDocRef(docpath));
 
           if (debug) {
-            console.log(
-              "firesTransaction: GET, DATA: " +
-                JSON.stringify(snap.data(), null, 2)
-            );
+            console.log("firesTransaction: GET, DATA: " + JSON.stringify(snap.data(), null, 2));
           }
 
           return snap.data() as Data;
         },
 
         async getAll<Data>(docpaths: string[]) {
-          const docs = await transaction.getAll(
-            ...docpaths.map((doc) => firesDocRef(doc))
-          );
+          const docs = await transaction.getAll(...docpaths.map((doc) => firesDocRef(doc)));
 
           if (docs.length <= 0) {
             if (debug) {
@@ -545,9 +515,7 @@ export async function firesTransaction(
 
         create<Data>(docpath: string, data: Data) {
           if (debug) {
-            console.log(
-              "firesTransaction: CREATE, DATA: " + JSON.stringify(data, null, 2)
-            );
+            console.log("firesTransaction: CREATE, DATA: " + JSON.stringify(data, null, 2));
           }
 
           transaction.create(firesDocRef(docpath), data);
@@ -564,6 +532,6 @@ export async function firesTransaction(
 
       return func(trans);
     },
-    { maxAttempts }
+    {maxAttempts},
   );
 }

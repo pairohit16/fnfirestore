@@ -78,16 +78,12 @@ function firesArrayRemove(element) {
 exports.firesArrayRemove = firesArrayRemove;
 /** Document Reference */
 function firesDocRef(docpath) {
-    return admin
-        .firestore()
-        .doc(docpath);
+    return admin.firestore().doc(docpath);
 }
 exports.firesDocRef = firesDocRef;
 /** Collection Reference */
 function firesColRef(colpath) {
-    return admin
-        .firestore()
-        .collection(colpath);
+    return admin.firestore().collection(colpath);
 }
 exports.firesColRef = firesColRef;
 /** Fetch the document */
@@ -368,8 +364,16 @@ function firescol(colpath, query, debug) {
                         base = base.limit(query.limit);
                     if (query === null || query === void 0 ? void 0 : query.offset)
                         base = base.offset(query.offset);
-                    if (query === null || query === void 0 ? void 0 : query.orderBy)
-                        base = base.orderBy(query.orderBy[0], query.orderBy[1]);
+                    if (query === null || query === void 0 ? void 0 : query.orderBy) {
+                        if (query.orderBy[1]) {
+                            base = base.orderBy(query.orderBy[0], query.orderBy[1]);
+                        }
+                        else {
+                            base = base.orderBy(query.orderBy[0]);
+                        }
+                    }
+                    if (query === null || query === void 0 ? void 0 : query.startAfter)
+                        base = base.startAfter(query.startAfter);
                     if (query === null || query === void 0 ? void 0 : query.where) {
                         if (Array.isArray(query.where[0])) {
                             query.where.forEach(function (_where) {
@@ -385,12 +389,15 @@ function firescol(colpath, query, debug) {
                     return [4 /*yield*/, base.get()];
                 case 1:
                     querySnap = (_a.sent());
-                    if (querySnap.empty)
+                    if (querySnap.empty) {
+                        if (query.dontThrowOnEmpty)
+                            return [2 /*return*/, []];
                         return [2 /*return*/, Promise.reject({
                                 code: 404,
                                 message: "Not Found!",
                                 nonexistent: true,
                             })];
+                    }
                     if (debug) {
                         console.log("firescol: LENGTH: " +
                             querySnap.docs.map(function (doc) { return doc.data(); }).length +
@@ -599,8 +606,7 @@ function firesTransaction(func, maxAttempts, debug) {
                                             case 1:
                                                 snap = _a.sent();
                                                 if (debug) {
-                                                    console.log("firesTransaction: GET, DATA: " +
-                                                        JSON.stringify(snap.data(), null, 2));
+                                                    console.log("firesTransaction: GET, DATA: " + JSON.stringify(snap.data(), null, 2));
                                                 }
                                                 return [2 /*return*/, snap.data()];
                                         }

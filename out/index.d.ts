@@ -29,40 +29,27 @@ pure?: boolean, debug?: boolean): Promise<void>;
 export declare function firesdocrt<Data>(docpath: string, create: Data, debug?: boolean): Promise<Data>;
 /** Delete the document */
 export declare function firesdocdel(docpath: string, debug?: boolean): Promise<void>;
-export declare type FirescolWhere<Data> = [
-    keyof Data,
-    "<" | "<=" | "==" | ">=" | ">" | "!=",
-    string | boolean | number
-] | [
-    keyof Data,
-    "array-contains" | "in" | "not-in" | "array-contains-any",
-    (string | boolean | number)[]
-] | ([
-    keyof Data,
-    "<" | "<=" | "==" | ">=" | ">" | "!=",
-    string | boolean | number
-] | [
-    keyof Data,
-    "array-contains" | "in" | "not-in" | "array-contains-any",
-    (string | boolean | number)[]
-])[];
+export declare type FirescolWhere<Data> = [keyof Data, "<" | "<=" | "==" | ">=" | ">" | "!=", string | boolean | number] | [keyof Data, "array-contains" | "in" | "not-in" | "array-contains-any", (string | boolean | number)[]] | ([keyof Data, "<" | "<=" | "==" | ">=" | ">" | "!=", string | boolean | number] | [keyof Data, "array-contains" | "in" | "not-in" | "array-contains-any", (string | boolean | number)[]])[];
 /**
  * Query firestore collection
  * @param colpath firestore collection path
  * @param query querys to filter collections
  */
 export declare function firescol<Data>(colpath: string, query?: {
+    /**
+     * Field values provider here must be same field value provided
+     * in the orderBy query, otherwise firestore will throw error
+     */
+    startAfter?: any;
     limit?: number;
     offset?: number;
-    orderBy?: [keyof Data, "desc" | "asc"];
+    orderBy?: [keyof Data, "desc" | "asc"] | [keyof Data];
+    /** Beware if you are using startAfter ,
+     * don't use where otherwise firebase will throw error! */
     where?: FirescolWhere<Data>;
+    dontThrowOnEmpty?: boolean;
 }, debug?: boolean): Promise<Data[]>;
-export declare type FiresbatchArgs<Data> = ([docpath: string, operation: "create", data: Data] | [
-    docpath: string,
-    operation: "update",
-    data: PartialDeep<Data>,
-    pure?: boolean
-] | [docpath: string, operation: "delete"])[];
+export declare type FiresbatchArgs<Data> = ([docpath: string, operation: "create", data: Data] | [docpath: string, operation: "update", data: PartialDeep<Data>, pure?: boolean] | [docpath: string, operation: "delete"])[];
 /** Batch firestore function */
 declare type BatchOP = {
     success: number;
