@@ -238,6 +238,12 @@ function rbcol(colpath, debug) {
                     return [4 /*yield*/, realtime.ref(colpath).once("value")];
                 case 1:
                     refs = _a.sent();
+                    if (!refs.exists)
+                        return [2 /*return*/, Promise.reject({
+                                code: 404,
+                                message: "Not Found!",
+                                nonexistent: true,
+                            })];
                     if (debug) {
                         console.log("rbcol: KEYS_COUNT: " +
                             Object.values(refs.val()).length +
@@ -611,6 +617,12 @@ function firesTransaction(func, maxAttempts, debug) {
                                             case 0: return [4 /*yield*/, transaction.get(firesDocRef(docpath))];
                                             case 1:
                                                 snap = _a.sent();
+                                                if (!snap.exists)
+                                                    return [2 /*return*/, Promise.reject({
+                                                            code: 404,
+                                                            message: "Not Found!",
+                                                            nonexistent: true,
+                                                        })];
                                                 if (debug) {
                                                     console.log("firesTransaction: GET, DATA: " + JSON.stringify(snap.data(), null, 2));
                                                 }
