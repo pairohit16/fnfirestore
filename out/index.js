@@ -374,6 +374,12 @@ function firescol(colpath, query, debug) {
                     }
                     if (query === null || query === void 0 ? void 0 : query.startAfter)
                         base = base.startAfter(query.startAfter);
+                    if (query === null || query === void 0 ? void 0 : query.startAt)
+                        base = base.startAt(query.startAt);
+                    if (query === null || query === void 0 ? void 0 : query.endBefore)
+                        base = base.endBefore(query.endBefore);
+                    if (query === null || query === void 0 ? void 0 : query.endAt)
+                        base = base.endAt(query.endAt);
                     if (query === null || query === void 0 ? void 0 : query.where) {
                         if (Array.isArray(query.where[0])) {
                             query.where.forEach(function (_where) {

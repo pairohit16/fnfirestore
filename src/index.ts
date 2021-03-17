@@ -129,6 +129,12 @@ export async function rbdocdel(docpath: string, debug?: boolean) {
 export async function rbcol<Data>(colpath: string, debug?: boolean) {
   try {
     const refs = await realtime.ref(colpath).once("value");
+    if (!refs.exists)
+      return Promise.reject({
+        code: 404,
+        message: "Not Found!",
+        nonexistent: true,
+      });
 
     if (debug) {
       console.log(
@@ -236,11 +242,17 @@ export async function firescol<Data>(
      * in the orderBy query, otherwise firestore will throw error
      */
     startAfter?: any;
+    startAt?: any;
+    endAt?: any;
+    endBefore?: any;
     limit?: number;
     offset?: number;
     orderBy?: [keyof Data, "desc" | "asc"] | [keyof Data];
-    /** Beware if you are using startAfter ,
-     * don't use where otherwise firebase will throw error! */
+    /** Beware if you are using startAfter or startAt or endAt or endBefore,
+     * don't use where otherwise firebase will throw error!
+     *
+     * Also if multiple field in where clause is also not allowed !
+     * You can use multiple where with single field! */
     where?: FirescolWhere<Data>;
     dontThrowOnEmpty?: boolean;
   },
@@ -257,7 +269,12 @@ export async function firescol<Data>(
         base = base.orderBy(query.orderBy[0]);
       }
     }
+
     if (query?.startAfter) base = base.startAfter(query.startAfter);
+    if (query?.startAt) base = base.startAt(query.startAt);
+    if (query?.endBefore) base = base.endBefore(query.endBefore);
+    if (query?.endAt) base = base.endAt(query.endAt);
+
     if (query?.where) {
       if (Array.isArray(query.where[0])) {
         query.where.forEach((_where: any) => {
@@ -470,6 +487,12 @@ export async function firesTransaction(
       const trans: Transaction = {
         async get<Data>(docpath: string) {
           const snap = await transaction.get(firesDocRef(docpath));
+          if (!snap.exists)
+            return Promise.reject({
+              code: 404,
+              message: "Not Found!",
+              nonexistent: true,
+            });
 
           if (debug) {
             console.log("firesTransaction: GET, DATA: " + JSON.stringify(snap.data(), null, 2));

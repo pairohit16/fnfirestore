@@ -41,11 +41,17 @@ export declare function firescol<Data>(colpath: string, query?: {
      * in the orderBy query, otherwise firestore will throw error
      */
     startAfter?: any;
+    startAt?: any;
+    endAt?: any;
+    endBefore?: any;
     limit?: number;
     offset?: number;
     orderBy?: [keyof Data, "desc" | "asc"] | [keyof Data];
-    /** Beware if you are using startAfter ,
-     * don't use where otherwise firebase will throw error! */
+    /** Beware if you are using startAfter or startAt or endAt or endBefore,
+     * don't use where otherwise firebase will throw error!
+     *
+     * Also if multiple field in where clause is also not allowed !
+     * You can use multiple where with single field! */
     where?: FirescolWhere<Data>;
     dontThrowOnEmpty?: boolean;
 }, debug?: boolean): Promise<Data[]>;
