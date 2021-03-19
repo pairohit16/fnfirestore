@@ -266,7 +266,7 @@ exports.rbcol = rbcol;
 /** Update the document */
 function firesdocup(docpath, update, 
 /** if enabled, on document don't exist it will throw an error */
-pure, debug) {
+pure, no_merge, debug) {
     return __awaiter(this, void 0, void 0, function () {
         var err_6;
         return __generator(this, function (_a) {
@@ -278,7 +278,7 @@ pure, debug) {
                 case 1:
                     _a.sent();
                     return [3 /*break*/, 4];
-                case 2: return [4 /*yield*/, firestore.doc(docpath).set(update, { merge: true })];
+                case 2: return [4 /*yield*/, firestore.doc(docpath).set(update, { merge: no_merge ? false : true })];
                 case 3:
                     _a.sent();
                     _a.label = 4;
@@ -466,7 +466,7 @@ function firesbatch(args, debug) {
                                                     if (debug) {
                                                         console.log("firesbatch: SET");
                                                     }
-                                                    batch.set(firestore.doc(arg[0]), arg[2], { merge: true });
+                                                    batch.set(firestore.doc(arg[0]), arg[2], { merge: arg[4] ? false : true });
                                                 }
                                                 break;
                                             case "delete":
@@ -654,7 +654,7 @@ function firesTransaction(func, maxAttempts, debug) {
                                     });
                                 });
                             },
-                            update: function (docpath, data, pure) {
+                            update: function (docpath, data, pure, no_merge) {
                                 if (pure) {
                                     if (debug) {
                                         console.log("firesTransaction: UPDATED");
@@ -666,7 +666,7 @@ function firesTransaction(func, maxAttempts, debug) {
                                         console.log("firesTransaction: SET");
                                     }
                                     transaction.set(firesDocRef(docpath), data, {
-                                        merge: true,
+                                        merge: no_merge ? false : true,
                                     });
                                 }
                             },

@@ -24,7 +24,7 @@ export declare function rbcol<Data>(colpath: string, debug?: boolean): Promise<D
 /** Update the document */
 export declare function firesdocup<Data>(docpath: string, update: PartialDeep<Data>, 
 /** if enabled, on document don't exist it will throw an error */
-pure?: boolean, debug?: boolean): Promise<void>;
+pure?: boolean, no_merge?: boolean, debug?: boolean): Promise<void>;
 /** Create the document */
 export declare function firesdocrt<Data>(docpath: string, create: Data, debug?: boolean): Promise<Data>;
 /** Delete the document */
@@ -55,7 +55,7 @@ export declare function firescol<Data>(colpath: string, query?: {
     where?: FirescolWhere<Data>;
     dontThrowOnEmpty?: boolean;
 }, debug?: boolean): Promise<Data[]>;
-export declare type FiresbatchArgs<Data> = ([docpath: string, operation: "create", data: Data] | [docpath: string, operation: "update", data: PartialDeep<Data>, pure?: boolean] | [docpath: string, operation: "delete"])[];
+export declare type FiresbatchArgs<Data> = ([docpath: string, operation: "create", data: Data] | [docpath: string, operation: "update", data: PartialDeep<Data>, pure?: boolean, no_merge?: boolean] | [docpath: string, operation: "delete"])[];
 /** Batch firestore function */
 declare type BatchOP = {
     success: number;
@@ -67,7 +67,7 @@ export declare function firesdocall<Data>(docpaths: string[], debug?: boolean): 
 export interface Transaction {
     get<Data>(docpath: string): Promise<Data>;
     getAll<Data>(docpaths: string[]): Promise<Data[]>;
-    update<Data>(docpath: string, data: PartialDeep<Data>, pure?: boolean): void;
+    update<Data>(docpath: string, data: PartialDeep<Data>, pure?: boolean, no_merge?: boolean): void;
     create<Data>(docpath: string, data: Data): void;
     delete(docpath: string): void;
 }

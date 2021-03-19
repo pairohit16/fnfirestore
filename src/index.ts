@@ -161,13 +161,14 @@ export async function firesdocup<Data>(
   update: PartialDeep<Data>,
   /** if enabled, on document don't exist it will throw an error */
   pure?: boolean,
+  no_merge?: boolean,
   debug?: boolean,
 ) {
   try {
     if (pure) {
       await firestore.doc(docpath).update(update);
     } else {
-      await firestore.doc(docpath).set(update, {merge: true});
+      await firestore.doc(docpath).set(update, {merge: no_merge ? false : true});
     }
 
     if (debug) {
@@ -322,7 +323,7 @@ export async function firescol<Data>(
 
 export type FiresbatchArgs<Data> = (
   | [docpath: string, operation: "create", data: Data]
-  | [docpath: string, operation: "update", data: PartialDeep<Data>, pure?: boolean]
+  | [docpath: string, operation: "update", data: PartialDeep<Data>, pure?: boolean, no_merge?: boolean]
   | [docpath: string, operation: "delete"]
 )[];
 /** Batch firestore function */
@@ -360,7 +361,7 @@ export async function firesbatch<Data>(args: FiresbatchArgs<Data>, debug?: boole
                 console.log("firesbatch: SET");
               }
 
-              batch.set(firestore.doc(arg[0]), arg[2], {merge: true});
+              batch.set(firestore.doc(arg[0]), arg[2], {merge: arg[4] ? false : true});
             }
             break;
           case "delete":
@@ -471,7 +472,7 @@ export async function firesdocall<Data>(docpaths: string[], debug?: boolean) {
 export interface Transaction {
   get<Data>(docpath: string): Promise<Data>;
   getAll<Data>(docpaths: string[]): Promise<Data[]>;
-  update<Data>(docpath: string, data: PartialDeep<Data>, pure?: boolean): void;
+  update<Data>(docpath: string, data: PartialDeep<Data>, pure?: boolean, no_merge?: boolean): void;
   create<Data>(docpath: string, data: Data): void;
   delete(docpath: string): void;
 }
@@ -518,7 +519,7 @@ export async function firesTransaction(
           return docs.map((d) => d.data()) as Data[];
         },
 
-        update<Data>(docpath: string, data: PartialDeep<Data>, pure?: boolean) {
+        update<Data>(docpath: string, data: PartialDeep<Data>, pure?: boolean, no_merge?: boolean) {
           if (pure) {
             if (debug) {
               console.log("firesTransaction: UPDATED");
@@ -531,7 +532,7 @@ export async function firesTransaction(
             }
 
             transaction.set(firesDocRef(docpath), data, {
-              merge: true,
+              merge: no_merge ? false : true,
             });
           }
         },
