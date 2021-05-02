@@ -174,27 +174,34 @@ function rbdoc(docpath, debug) {
 }
 exports.rbdoc = rbdoc;
 /** Update the document (realtime database) */
-function rbdocup(docpath, update, debug) {
+function rbdocup(docpath, update, method, debug) {
     return __awaiter(this, void 0, void 0, function () {
         var err_3;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
-                    _a.trys.push([0, 2, , 3]);
-                    return [4 /*yield*/, realtime.ref(docpath).set(update)];
+                    _a.trys.push([0, 5, , 6]);
+                    if (!(method === "update" || method === undefined)) return [3 /*break*/, 2];
+                    return [4 /*yield*/, realtime.ref(docpath).update(update)];
                 case 1:
                     _a.sent();
+                    return [3 /*break*/, 4];
+                case 2: return [4 /*yield*/, realtime.ref(docpath).set(update)];
+                case 3:
+                    _a.sent();
+                    _a.label = 4;
+                case 4:
                     if (debug) {
                         console.log("rbdocup: UPDATED");
                     }
                     return [2 /*return*/, Promise.resolve()];
-                case 2:
+                case 5:
                     err_3 = _a.sent();
                     if (debug) {
                         console.log({ rbdocup: err_3 });
                     }
                     return [2 /*return*/, Promise.reject()];
-                case 3: return [2 /*return*/];
+                case 6: return [2 /*return*/];
             }
         });
     });

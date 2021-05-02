@@ -88,9 +88,18 @@ export async function rbdoc<Data>(docpath: string, debug?: boolean) {
 }
 
 /** Update the document (realtime database) */
-export async function rbdocup<Data>(docpath: string, update: Data, debug?: boolean) {
+export async function rbdocup<Data>(
+  docpath: string,
+  update: PartialDeep<Data>,
+  method?: "set" | "update",
+  debug?: boolean,
+) {
   try {
-    await realtime.ref(docpath).set(update);
+    if (method === "update" || method === undefined) {
+      await realtime.ref(docpath).update(update as any);
+    } else {
+      await realtime.ref(docpath).set(update);
+    }
 
     if (debug) {
       console.log("rbdocup: UPDATED");
@@ -228,7 +237,11 @@ export type FirescolWhere<Data> =
   | [keyof Data, "array-contains" | "in" | "not-in" | "array-contains-any", (string | boolean | number)[]]
   | (
       | [keyof Data, "<" | "<=" | "==" | ">=" | ">" | "!=", string | boolean | number]
-      | [keyof Data, "array-contains" | "in" | "not-in" | "array-contains-any", (string | boolean | number)[]]
+      | [
+          keyof Data,
+          "!=" | "==" | "array-contains" | "in" | "not-in" | "array-contains-any",
+          (string | boolean | number)[],
+        ]
     )[];
 /**
  * Query firestore collection

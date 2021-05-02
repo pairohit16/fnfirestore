@@ -16,7 +16,7 @@ export declare function isfiresdoc(docpath: string): Promise<boolean>;
 /** Fetch the document (realtime database) */
 export declare function rbdoc<Data>(docpath: string, debug?: boolean): Promise<Data>;
 /** Update the document (realtime database) */
-export declare function rbdocup<Data>(docpath: string, update: Data, debug?: boolean): Promise<void>;
+export declare function rbdocup<Data>(docpath: string, update: PartialDeep<Data>, method?: "set" | "update", debug?: boolean): Promise<void>;
 /** Delete the document (realtime database) */
 export declare function rbdocdel(docpath: string, debug?: boolean): Promise<void>;
 /** Get the collection (realtime database) */
@@ -29,7 +29,11 @@ pure?: boolean, no_merge?: boolean, debug?: boolean): Promise<void>;
 export declare function firesdocrt<Data>(docpath: string, create: Data, debug?: boolean): Promise<Data>;
 /** Delete the document */
 export declare function firesdocdel(docpath: string, debug?: boolean): Promise<void>;
-export declare type FirescolWhere<Data> = [keyof Data, "<" | "<=" | "==" | ">=" | ">" | "!=", string | boolean | number] | [keyof Data, "array-contains" | "in" | "not-in" | "array-contains-any", (string | boolean | number)[]] | ([keyof Data, "<" | "<=" | "==" | ">=" | ">" | "!=", string | boolean | number] | [keyof Data, "array-contains" | "in" | "not-in" | "array-contains-any", (string | boolean | number)[]])[];
+export declare type FirescolWhere<Data> = [keyof Data, "<" | "<=" | "==" | ">=" | ">" | "!=", string | boolean | number] | [keyof Data, "array-contains" | "in" | "not-in" | "array-contains-any", (string | boolean | number)[]] | ([keyof Data, "<" | "<=" | "==" | ">=" | ">" | "!=", string | boolean | number] | [
+    keyof Data,
+    "!=" | "==" | "array-contains" | "in" | "not-in" | "array-contains-any",
+    (string | boolean | number)[]
+])[];
 /**
  * Query firestore collection
  * @param colpath firestore collection path
