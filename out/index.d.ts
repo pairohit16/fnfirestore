@@ -16,7 +16,14 @@ export declare function isfiresdoc(docpath: string): Promise<boolean>;
 /** Fetch the document (realtime database) */
 export declare function rbdoc<Data>(docpath: string, debug?: boolean): Promise<Data>;
 /** Update the document (realtime database) */
-export declare function rbdocup<Data>(docpath: string, update: PartialDeep<Data>, method?: "set" | "update", debug?: boolean): Promise<void>;
+export declare function rbdocup<Data>(docpath: string, o: {
+    method: "set" | "update";
+    data: Data;
+} | {
+    method: "merge";
+    data: Data;
+    update: PartialDeep<Data>;
+}, debug?: boolean): Promise<void>;
 /** Delete the document (realtime database) */
 export declare function rbdocdel(docpath: string, debug?: boolean): Promise<void>;
 /** Get the collection (realtime database) */
@@ -68,6 +75,11 @@ declare type BatchOP = {
 export declare function firesbatch<Data>(args: FiresbatchArgs<Data>, debug?: boolean): Promise<BatchOP>;
 /** Fetch all docs at once */
 export declare function firesdocall<Data>(docpaths: string[], debug?: boolean): Promise<Data[]>;
+export declare function rbTransaction<Data>(docpath: string, value: (d: Data, merge: (d: Data, update: PartialDeep<Data>) => Data) => Data | void, onComplete?: (props: {
+    error: any;
+    committed: boolean;
+    value: Data;
+}) => Promise<any>): Promise<unknown>;
 export interface Transaction {
     get<Data>(docpath: string): Promise<Data>;
     getAll<Data>(docpaths: string[]): Promise<Data[]>;

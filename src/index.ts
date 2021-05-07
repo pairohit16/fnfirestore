@@ -1,5 +1,7 @@
 import * as admin from "firebase-admin";
+import _ from "lodash";
 import {PartialDeep} from "./custom-types";
+
 const firestore = admin.firestore();
 const realtime = admin.database();
 
@@ -90,17 +92,26 @@ export async function rbdoc<Data>(docpath: string, debug?: boolean) {
 /** Update the document (realtime database) */
 export async function rbdocup<Data>(
   docpath: string,
-  update: PartialDeep<Data>,
-  method?: "set" | "update",
+  o:
+    | {
+        method: "set" | "update";
+        data: Data;
+      }
+    | {
+        method: "merge";
+        data: Data;
+        update: PartialDeep<Data>;
+      },
   debug?: boolean,
 ) {
   try {
-    if (method === "update" || method === undefined) {
-      await realtime.ref(docpath).update(update as any);
-    } else {
-      await realtime.ref(docpath).set(update);
+    if (o.method === "set") {
+      await realtime.ref(docpath).set(o.data);
+    } else if (o.method === "update") {
+      await realtime.ref(docpath).update(o.data);
+    } else if (o.method === "merge") {
+      await realtime.ref(docpath).update(_.merge(o.data, o.update));
     }
-
     if (debug) {
       console.log("rbdocup: UPDATED");
     }
@@ -480,6 +491,27 @@ export async function firesdocall<Data>(docpaths: string[], debug?: boolean) {
 
     return Promise.reject();
   }
+}
+
+export async function rbTransaction<Data>(
+  docpath: string,
+  value: (d: Data, merge: (d: Data, update: PartialDeep<Data>) => Data) => Data | void | null,
+  onComplete?: (props: {error: any; committed: boolean; value: Data}) => Promise<any>,
+) {
+  return new Promise((resolve) => {
+    realtime.ref(docpath).transaction(
+      (_v) => {
+        return value(_v, _.merge);
+      },
+      (error, committed, sp) => {
+        if (onComplete) {
+          onComplete({error, committed, value: sp.val()}).finally(() => {
+            resolve(true);
+          });
+        } else resolve(true);
+      },
+    );
+  });
 }
 
 export interface Transaction {

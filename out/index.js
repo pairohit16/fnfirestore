@@ -54,9 +54,13 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.firesTransaction = exports.firesdocall = exports.firesbatch = exports.firescol = exports.firesdocdel = exports.firesdocrt = exports.firesdocup = exports.rbcol = exports.rbdocdel = exports.rbdocup = exports.rbdoc = exports.isfiresdoc = exports.firesdoc = exports.firesColRef = exports.firesDocRef = exports.firesArrayRemove = exports.firesArrayUnion = exports.firesIncrementBy = void 0;
+exports.firesTransaction = exports.rbTransaction = exports.firesdocall = exports.firesbatch = exports.firescol = exports.firesdocdel = exports.firesdocrt = exports.firesdocup = exports.rbcol = exports.rbdocdel = exports.rbdocup = exports.rbdoc = exports.isfiresdoc = exports.firesdoc = exports.firesColRef = exports.firesDocRef = exports.firesArrayRemove = exports.firesArrayUnion = exports.firesIncrementBy = void 0;
 var admin = __importStar(require("firebase-admin"));
+var lodash_1 = __importDefault(require("lodash"));
 var firestore = admin.firestore();
 var realtime = admin.database();
 /** Relative increment */
@@ -174,34 +178,42 @@ function rbdoc(docpath, debug) {
 }
 exports.rbdoc = rbdoc;
 /** Update the document (realtime database) */
-function rbdocup(docpath, update, method, debug) {
+function rbdocup(docpath, o, debug) {
     return __awaiter(this, void 0, void 0, function () {
         var err_3;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
-                    _a.trys.push([0, 5, , 6]);
-                    if (!(method === "update" || method === undefined)) return [3 /*break*/, 2];
-                    return [4 /*yield*/, realtime.ref(docpath).update(update)];
+                    _a.trys.push([0, 7, , 8]);
+                    if (!(o.method === "set")) return [3 /*break*/, 2];
+                    return [4 /*yield*/, realtime.ref(docpath).set(o.data)];
                 case 1:
                     _a.sent();
-                    return [3 /*break*/, 4];
-                case 2: return [4 /*yield*/, realtime.ref(docpath).set(update)];
+                    return [3 /*break*/, 6];
+                case 2:
+                    if (!(o.method === "update")) return [3 /*break*/, 4];
+                    return [4 /*yield*/, realtime.ref(docpath).update(o.data)];
                 case 3:
                     _a.sent();
-                    _a.label = 4;
+                    return [3 /*break*/, 6];
                 case 4:
+                    if (!(o.method === "merge")) return [3 /*break*/, 6];
+                    return [4 /*yield*/, realtime.ref(docpath).update(lodash_1.default.merge(o.data, o.update))];
+                case 5:
+                    _a.sent();
+                    _a.label = 6;
+                case 6:
                     if (debug) {
                         console.log("rbdocup: UPDATED");
                     }
                     return [2 /*return*/, Promise.resolve()];
-                case 5:
+                case 7:
                     err_3 = _a.sent();
                     if (debug) {
                         console.log({ rbdocup: err_3 });
                     }
                     return [2 /*return*/, Promise.reject()];
-                case 6: return [2 /*return*/];
+                case 8: return [2 /*return*/];
             }
         });
     });
@@ -606,6 +618,26 @@ function firesdocall(docpaths, debug) {
     });
 }
 exports.firesdocall = firesdocall;
+function rbTransaction(docpath, value, onComplete) {
+    return __awaiter(this, void 0, void 0, function () {
+        return __generator(this, function (_a) {
+            return [2 /*return*/, new Promise(function (resolve) {
+                    realtime.ref(docpath).transaction(function (_v) {
+                        return value(_v, lodash_1.default.merge);
+                    }, function (error, committed, sp) {
+                        if (onComplete) {
+                            onComplete({ error: error, committed: committed, value: sp.val() }).finally(function () {
+                                resolve(true);
+                            });
+                        }
+                        else
+                            resolve(true);
+                    });
+                })];
+        });
+    });
+}
+exports.rbTransaction = rbTransaction;
 /** Transaction */
 function firesTransaction(func, maxAttempts, debug) {
     if (maxAttempts === void 0) { maxAttempts = 3; }
