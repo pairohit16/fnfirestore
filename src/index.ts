@@ -20,13 +20,13 @@ export function firesArrayRemove<Element>(element: Element[]): Element[] {
 }
 
 /** Document Reference */
-export function firesDocRef<Data>(docpath: string) {
-  return admin.firestore().doc(docpath) as admin.firestore.DocumentReference<Data>;
+export function firesDocRef<T = admin.firestore.DocumentReference>(docpath: string): T {
+  return admin.firestore().doc(docpath) as any;
 }
 
 /** Collection Reference */
-export function firesColRef<Data>(colpath: string) {
-  return admin.firestore().collection(colpath) as admin.firestore.CollectionReference<Data>;
+export function firesColRef<T = admin.firestore.CollectionReference>(colpath: string): T[] {
+  return admin.firestore().collection(colpath) as any;
 }
 
 /** Fetch the document */
@@ -533,6 +533,7 @@ export async function firesTransaction(
       const trans: Transaction = {
         async get<Data>(docpath: string) {
           const snap = await transaction.get(firesDocRef(docpath));
+          // @ts-ignore
           if (!snap.exists)
             return Promise.reject({
               code: 404,
@@ -541,9 +542,11 @@ export async function firesTransaction(
             });
 
           if (debug) {
+            // @ts-ignore
             console.log("firesTransaction: GET, DATA: " + JSON.stringify(snap.data(), null, 2));
           }
 
+          // @ts-ignore
           return snap.data() as Data;
         },
 

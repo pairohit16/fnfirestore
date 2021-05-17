@@ -656,6 +656,7 @@ function firesTransaction(func, maxAttempts, debug) {
                                             case 0: return [4 /*yield*/, transaction.get(firesDocRef(docpath))];
                                             case 1:
                                                 snap = _a.sent();
+                                                // @ts-ignore
                                                 if (!snap.exists)
                                                     return [2 /*return*/, Promise.reject({
                                                             code: 404,
@@ -663,8 +664,10 @@ function firesTransaction(func, maxAttempts, debug) {
                                                             nonexistent: true,
                                                         })];
                                                 if (debug) {
+                                                    // @ts-ignore
                                                     console.log("firesTransaction: GET, DATA: " + JSON.stringify(snap.data(), null, 2));
                                                 }
+                                                // @ts-ignore
                                                 return [2 /*return*/, snap.data()];
                                         }
                                     });

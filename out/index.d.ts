@@ -1,3 +1,4 @@
+import * as admin from "firebase-admin";
 import { PartialDeep } from "./custom-types";
 /** Relative increment */
 export declare function firesIncrementBy(number: number): number;
@@ -6,9 +7,9 @@ export declare function firesArrayUnion<Element>(element: Element[]): Element[];
 /** Array Union */
 export declare function firesArrayRemove<Element>(element: Element[]): Element[];
 /** Document Reference */
-export declare function firesDocRef<Data>(docpath: string): FirebaseFirestore.DocumentReference<Data>;
+export declare function firesDocRef<T = admin.firestore.DocumentReference>(docpath: string): T;
 /** Collection Reference */
-export declare function firesColRef<Data>(colpath: string): FirebaseFirestore.CollectionReference<Data>;
+export declare function firesColRef<T = admin.firestore.CollectionReference>(colpath: string): T[];
 /** Fetch the document */
 export declare function firesdoc<Data>(docpath: string, debug?: boolean): Promise<Data>;
 /** check weather document exists */
@@ -75,7 +76,7 @@ declare type BatchOP = {
 export declare function firesbatch<Data>(args: FiresbatchArgs<Data>, debug?: boolean): Promise<BatchOP>;
 /** Fetch all docs at once */
 export declare function firesdocall<Data>(docpaths: string[], debug?: boolean): Promise<Data[]>;
-export declare function rbTransaction<Data>(docpath: string, value: (d: Data, merge: (d: Data, update: PartialDeep<Data>) => Data) => Data | void, onComplete?: (props: {
+export declare function rbTransaction<Data>(docpath: string, value: (d: Data, merge: (d: Data, update: PartialDeep<Data>) => Data) => Data | void | null, onComplete?: (props: {
     error: any;
     committed: boolean;
     value: Data;
