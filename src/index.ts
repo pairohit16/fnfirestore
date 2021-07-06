@@ -225,15 +225,45 @@ export async function firesdocrt<Data>(docpath: string, create: Data, debug?: bo
 }
 
 /** Delete the document */
-export async function firesdocdel(docpath: string, debug?: boolean) {
+export async function firesdocdel(
+  docpath: string,
+  /** If true, then it also delete sub-collections under that document aswell */
+  recursive?: boolean,
+  debug?: boolean,
+) {
   try {
-    await firestore.doc(docpath).delete();
+    if (recursive) {
+      var deleteDocument = async (doc: FirebaseFirestore.DocumentReference) => {
+        const collections = await doc.listCollections();
+        await Promise.all(collections.map((collection) => deleteCollection(collection)));
+        await doc.delete();
+      };
 
-    if (debug) {
-      console.log("firesdocdel: DELETED");
+      var deleteCollection = async (collection: FirebaseFirestore.CollectionReference) => {
+        const query = collection.limit(100);
+        while (true) {
+          const snap = await query.get();
+          if (snap.empty) {
+            return;
+          }
+          await Promise.all(snap.docs.map((doc) => deleteDocument(doc.ref)));
+        }
+      };
+
+      await deleteDocument(firestore.doc(docpath));
+      if (debug) {
+        console.log("firesdocdel: DELETED with it's subcollection");
+      }
+
+      return Promise.resolve();
+    } else {
+      await firestore.doc(docpath).delete();
+      if (debug) {
+        console.log("firesdocdel: DELETED");
+      }
+
+      return Promise.resolve();
     }
-
-    return Promise.resolve();
   } catch (err) {
     if (debug) {
       console.log({firesdocdel: err});
@@ -272,7 +302,10 @@ export async function firescol<Data>(
     endBefore?: any;
     limit?: number;
     offset?: number;
-    orderBy?: [keyof Data, "desc" | "asc"] | [keyof Data];
+    orderBy?:
+      | [keyof Data, "desc" | "asc"]
+      | [keyof Data]
+      | Array<[keyof Data, "desc" | "asc"] | [keyof Data]>;
     /** Beware if you are using startAfter or startAt or endAt or endBefore,
      * don't use where otherwise firebase will throw error!
      *
@@ -288,10 +321,13 @@ export async function firescol<Data>(
     if (query?.limit) base = base.limit(query.limit);
     if (query?.offset) base = base.offset(query.offset);
     if (query?.orderBy) {
-      if (query.orderBy[1]) {
-        base = base.orderBy(query.orderBy[0], query.orderBy[1]);
+      if (Array.isArray(query.orderBy[0])) {
       } else {
-        base = base.orderBy(query.orderBy[0]);
+        if (query.orderBy[1]) {
+          base = base.orderBy(query.orderBy[0], query.orderBy[1]);
+        } else {
+          base = base.orderBy(query.orderBy[0]);
+        }
       }
     }
 
@@ -345,6 +381,25 @@ export async function firescol<Data>(
   }
 }
 
+/** Delete the documents in the collection */
+export async function firescoldel(colpath: string, debug?: boolean) {
+  try {
+    const {docs} = await firestore.collection(colpath).get();
+    await firesbatch(docs.map((doc) => [doc.ref.path, "delete"]));
+
+    if (debug) {
+      console.log("firescoldel: DELETED");
+    }
+
+    return Promise.resolve();
+  } catch (err) {
+    if (debug) {
+      console.log({firesdocdel: err});
+    }
+
+    return Promise.reject();
+  }
+}
 export type FiresbatchArgs<Data> = (
   | [docpath: string, operation: "create", data: Data]
   | [docpath: string, operation: "update", data: PartialDeep<Data>, pure?: boolean, no_merge?: boolean]

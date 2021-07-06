@@ -58,7 +58,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.firesTransaction = exports.rbTransaction = exports.firesdocall = exports.firesbatch = exports.firescol = exports.firesdocdel = exports.firesdocrt = exports.firesdocup = exports.rbcol = exports.rbdocdel = exports.rbdocup = exports.rbdoc = exports.isfiresdoc = exports.firesdoc = exports.firesColRef = exports.firesDocRef = exports.firesArrayRemove = exports.firesArrayUnion = exports.firesIncrementBy = void 0;
+exports.firesTransaction = exports.rbTransaction = exports.firesdocall = exports.firesbatch = exports.firescoldel = exports.firescol = exports.firesdocdel = exports.firesdocrt = exports.firesdocup = exports.rbcol = exports.rbdocdel = exports.rbdocup = exports.rbdoc = exports.isfiresdoc = exports.firesdoc = exports.firesColRef = exports.firesDocRef = exports.firesArrayRemove = exports.firesArrayUnion = exports.firesIncrementBy = void 0;
 var admin = __importStar(require("firebase-admin"));
 var lodash_1 = __importDefault(require("lodash"));
 var firestore = admin.firestore();
@@ -346,27 +346,79 @@ function firesdocrt(docpath, create, debug) {
 }
 exports.firesdocrt = firesdocrt;
 /** Delete the document */
-function firesdocdel(docpath, debug) {
+function firesdocdel(docpath, 
+/** If true, then it also delete sub-collections under that document aswell */
+recursive, debug) {
     return __awaiter(this, void 0, void 0, function () {
-        var err_8;
+        var deleteDocument, deleteCollection, err_8;
+        var _this = this;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
-                    _a.trys.push([0, 2, , 3]);
-                    return [4 /*yield*/, firestore.doc(docpath).delete()];
+                    _a.trys.push([0, 5, , 6]);
+                    if (!recursive) return [3 /*break*/, 2];
+                    deleteDocument = function (doc) { return __awaiter(_this, void 0, void 0, function () {
+                        var collections;
+                        return __generator(this, function (_a) {
+                            switch (_a.label) {
+                                case 0: return [4 /*yield*/, doc.listCollections()];
+                                case 1:
+                                    collections = _a.sent();
+                                    return [4 /*yield*/, Promise.all(collections.map(function (collection) { return deleteCollection(collection); }))];
+                                case 2:
+                                    _a.sent();
+                                    return [4 /*yield*/, doc.delete()];
+                                case 3:
+                                    _a.sent();
+                                    return [2 /*return*/];
+                            }
+                        });
+                    }); };
+                    deleteCollection = function (collection) { return __awaiter(_this, void 0, void 0, function () {
+                        var query, snap;
+                        return __generator(this, function (_a) {
+                            switch (_a.label) {
+                                case 0:
+                                    query = collection.limit(100);
+                                    _a.label = 1;
+                                case 1:
+                                    if (!true) return [3 /*break*/, 4];
+                                    return [4 /*yield*/, query.get()];
+                                case 2:
+                                    snap = _a.sent();
+                                    if (snap.empty) {
+                                        return [2 /*return*/];
+                                    }
+                                    return [4 /*yield*/, Promise.all(snap.docs.map(function (doc) { return deleteDocument(doc.ref); }))];
+                                case 3:
+                                    _a.sent();
+                                    return [3 /*break*/, 1];
+                                case 4: return [2 /*return*/];
+                            }
+                        });
+                    }); };
+                    return [4 /*yield*/, deleteDocument(firestore.doc(docpath))];
                 case 1:
+                    _a.sent();
+                    if (debug) {
+                        console.log("firesdocdel: DELETED with it's subcollection");
+                    }
+                    return [2 /*return*/, Promise.resolve()];
+                case 2: return [4 /*yield*/, firestore.doc(docpath).delete()];
+                case 3:
                     _a.sent();
                     if (debug) {
                         console.log("firesdocdel: DELETED");
                     }
                     return [2 /*return*/, Promise.resolve()];
-                case 2:
+                case 4: return [3 /*break*/, 6];
+                case 5:
                     err_8 = _a.sent();
                     if (debug) {
                         console.log({ firesdocdel: err_8 });
                     }
                     return [2 /*return*/, Promise.reject()];
-                case 3: return [2 /*return*/];
+                case 6: return [2 /*return*/];
             }
         });
     });
@@ -390,11 +442,15 @@ function firescol(colpath, query, debug) {
                     if (query === null || query === void 0 ? void 0 : query.offset)
                         base = base.offset(query.offset);
                     if (query === null || query === void 0 ? void 0 : query.orderBy) {
-                        if (query.orderBy[1]) {
-                            base = base.orderBy(query.orderBy[0], query.orderBy[1]);
+                        if (Array.isArray(query.orderBy[0])) {
                         }
                         else {
-                            base = base.orderBy(query.orderBy[0]);
+                            if (query.orderBy[1]) {
+                                base = base.orderBy(query.orderBy[0], query.orderBy[1]);
+                            }
+                            else {
+                                base = base.orderBy(query.orderBy[0]);
+                            }
                         }
                     }
                     if (query === null || query === void 0 ? void 0 : query.startAfter)
@@ -448,9 +504,39 @@ function firescol(colpath, query, debug) {
     });
 }
 exports.firescol = firescol;
+/** Delete the documents in the collection */
+function firescoldel(colpath, debug) {
+    return __awaiter(this, void 0, void 0, function () {
+        var docs, err_10;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    _a.trys.push([0, 3, , 4]);
+                    return [4 /*yield*/, firestore.collection(colpath).get()];
+                case 1:
+                    docs = (_a.sent()).docs;
+                    return [4 /*yield*/, firesbatch(docs.map(function (doc) { return [doc.ref.path, "delete"]; }))];
+                case 2:
+                    _a.sent();
+                    if (debug) {
+                        console.log("firescoldel: DELETED");
+                    }
+                    return [2 /*return*/, Promise.resolve()];
+                case 3:
+                    err_10 = _a.sent();
+                    if (debug) {
+                        console.log({ firesdocdel: err_10 });
+                    }
+                    return [2 /*return*/, Promise.reject()];
+                case 4: return [2 /*return*/];
+            }
+        });
+    });
+}
+exports.firescoldel = firescoldel;
 function firesbatch(args, debug) {
     return __awaiter(this, void 0, void 0, function () {
-        var op_1, perBatch_1, FIRBASE_MAX_BATCH_DOC_COUNT, args500_1, into, loops, i, err_10;
+        var op_1, perBatch_1, FIRBASE_MAX_BATCH_DOC_COUNT, args500_1, into, loops, i, err_11;
         var _this = this;
         return __generator(this, function (_a) {
             switch (_a.label) {
@@ -573,9 +659,9 @@ function firesbatch(args, debug) {
                 case 2: return [2 /*return*/, _a.sent()];
                 case 3: return [3 /*break*/, 5];
                 case 4:
-                    err_10 = _a.sent();
+                    err_11 = _a.sent();
                     if (debug) {
-                        console.log({ firesbatch: err_10 });
+                        console.log({ firesbatch: err_11 });
                     }
                     return [2 /*return*/, Promise.reject()];
                 case 5: return [2 /*return*/];
@@ -587,7 +673,7 @@ exports.firesbatch = firesbatch;
 /** Fetch all docs at once */
 function firesdocall(docpaths, debug) {
     return __awaiter(this, void 0, void 0, function () {
-        var docs, err_11;
+        var docs, err_12;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
@@ -607,9 +693,9 @@ function firesdocall(docpaths, debug) {
                     }
                     return [2 /*return*/, docs.map(function (d) { return d.data(); })];
                 case 2:
-                    err_11 = _a.sent();
+                    err_12 = _a.sent();
                     if (debug) {
-                        console.log({ firesdocall: err_11 });
+                        console.log({ firesdocall: err_12 });
                     }
                     return [2 /*return*/, Promise.reject()];
                 case 3: return [2 /*return*/];

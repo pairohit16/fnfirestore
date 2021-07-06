@@ -36,7 +36,9 @@ pure?: boolean, no_merge?: boolean, debug?: boolean): Promise<void>;
 /** Create the document */
 export declare function firesdocrt<Data>(docpath: string, create: Data, debug?: boolean): Promise<Data>;
 /** Delete the document */
-export declare function firesdocdel(docpath: string, debug?: boolean): Promise<void>;
+export declare function firesdocdel(docpath: string, 
+/** If true, then it also delete sub-collections under that document aswell */
+recursive?: boolean, debug?: boolean): Promise<void>;
 export declare type FirescolWhere<Data> = [keyof Data, "<" | "<=" | "==" | ">=" | ">" | "!=", string | boolean | number] | [keyof Data, "array-contains" | "in" | "not-in" | "array-contains-any", (string | boolean | number)[]] | ([keyof Data, "<" | "<=" | "==" | ">=" | ">" | "!=", string | boolean | number] | [
     keyof Data,
     "!=" | "==" | "array-contains" | "in" | "not-in" | "array-contains-any",
@@ -58,7 +60,7 @@ export declare function firescol<Data>(colpath: string, query?: {
     endBefore?: any;
     limit?: number;
     offset?: number;
-    orderBy?: [keyof Data, "desc" | "asc"] | [keyof Data];
+    orderBy?: [keyof Data, "desc" | "asc"] | [keyof Data] | Array<[keyof Data, "desc" | "asc"] | [keyof Data]>;
     /** Beware if you are using startAfter or startAt or endAt or endBefore,
      * don't use where otherwise firebase will throw error!
      *
@@ -67,6 +69,8 @@ export declare function firescol<Data>(colpath: string, query?: {
     where?: FirescolWhere<Data>;
     dontThrowOnEmpty?: boolean;
 }, debug?: boolean): Promise<Data[]>;
+/** Delete the documents in the collection */
+export declare function firescoldel(colpath: string, debug?: boolean): Promise<void>;
 export declare type FiresbatchArgs<Data> = ([docpath: string, operation: "create", data: Data] | [docpath: string, operation: "update", data: PartialDeep<Data>, pure?: boolean, no_merge?: boolean] | [docpath: string, operation: "delete"])[];
 /** Batch firestore function */
 declare type BatchOP = {
